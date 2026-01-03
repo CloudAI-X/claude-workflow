@@ -2,22 +2,10 @@
   "name": "project-starter",
   "version": "1.0.0",
   "description": "Universal Claude Code workflow with specialized agents, skills, hooks, and output styles for any software project. Includes orchestrator, code-reviewer, debugger, docs-writer, security-auditor, refactorer, and test-architect agents.",
-  "author": {
-    "name": "CloudAI-X",
-    "url": "https://x.com/cloudxdev"
-  },
+  "author": "CloudAI-X",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/CloudAI-X/claude-workflow.git"
-  },
-  "bugs": {
-    "url": "https://github.com/CloudAI-X/claude-workflow/issues"
-  },
+  "repository": "https://github.com/CloudAI-X/claude-workflow",
   "homepage": "https://github.com/CloudAI-X/claude-workflow#readme",
-  "engines": {
-    "claude-code": ">=1.0.33"
-  },
   "keywords": [
     "workflow",
     "agents",

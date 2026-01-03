@@ -1,81 +1,83 @@
 {
-  "PreToolUse": [
-    {
-      "matcher": "Edit|Write",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/protect-files.py"
-        },
-        {
-          "type": "command",
-          "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/security-check.py"
-        }
-      ]
-    },
-    {
-      "matcher": "Bash",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/log-commands.sh"
-        }
-      ]
-    }
-  ],
-  "PostToolUse": [
-    {
-      "matcher": "Edit|Write",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/format-on-edit.py"
-        }
-      ]
-    }
-  ],
-  "Notification": [
-    {
-      "matcher": ".*",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/notify-input.sh"
-        }
-      ]
-    }
-  ],
-  "Stop": [
-    {
-      "matcher": ".*",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/notify-complete.sh"
-        }
-      ]
-    }
-  ],
-  "SessionStart": [
-    {
-      "matcher": ".*",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/validate-environment.py"
-        }
-      ]
-    }
-  ],
-  "UserPromptSubmit": [
-    {
-      "matcher": ".*",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/validate-prompt.py"
-        }
-      ]
-    }
-  ]
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/protect-files.py"
+          },
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/security-check.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/log-commands.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/format-on-edit.py"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/notify-input.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/notify-complete.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/validate-environment.py"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/validate-prompt.py"
+          }
+        ]
+      }
+    ]
+  }
 }
