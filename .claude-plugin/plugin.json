@@ -7,17 +7,8 @@
     "url": "https://x.com/cloudxdev"
   },
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/CloudAI-X/claude-workflow.git"
-  },
-  "bugs": {
-    "url": "https://github.com/CloudAI-X/claude-workflow/issues"
-  },
+  "repository": "https://github.com/CloudAI-X/claude-workflow",
   "homepage": "https://github.com/CloudAI-X/claude-workflow#readme",
-  "engines": {
-    "claude-code": ">=1.0.33"
-  },
   "keywords": [
     "workflow",
     "agents",
