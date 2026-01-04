@@ -28,8 +28,8 @@ import { query } from "@anthropic-ai/claude-agent-sdk";
 for await (const message of query({
   prompt: "Hello",
   options: {
-    plugins: [{ type: "local", path: "./claude-workflow" }]
-  }
+    plugins: [{ type: "local", path: "./claude-workflow" }],
+  },
 })) {
   // Plugin commands, agents, and skills are now available
 }
@@ -69,12 +69,12 @@ These commands become available:
 
 ## What's Included
 
-| Component | Count | Description |
-|-----------|-------|-------------|
-| **Agents** | 7 | Specialized subagents for code review, debugging, security, etc. |
-| **Commands** | 17 | Slash commands for workflows and output styles |
-| **Skills** | 6 | Knowledge domains Claude uses autonomously |
-| **Hooks** | 9 | Automation scripts for formatting, security, verification, notifications |
+| Component    | Count | Description                                                              |
+| ------------ | ----- | ------------------------------------------------------------------------ |
+| **Agents**   | 7     | Specialized subagents for code review, debugging, security, etc.         |
+| **Commands** | 17    | Slash commands for workflows and output styles                           |
+| **Skills**   | 6     | Knowledge domains Claude uses autonomously                               |
+| **Hooks**    | 9     | Automation scripts for formatting, security, verification, notifications |
 
 ---
 
@@ -83,6 +83,7 @@ These commands become available:
 ### Commands in Action
 
 **Auto-commit your changes:**
+
 ```
 > /project-starter:commit
 
@@ -91,6 +92,7 @@ Looking at staged changes...
 ```
 
 **Full git workflow:**
+
 ```
 > /project-starter:commit-push-pr
 
@@ -100,6 +102,7 @@ Looking at staged changes...
 ```
 
 **Verify before shipping:**
+
 ```
 > /project-starter:verify-changes
 
@@ -117,6 +120,7 @@ Ready to ship!
 Agents spawn automatically based on your request:
 
 **You say:** "The login is broken, users get 401 errors"
+
 ```
 [debugger agent activated]
 → Checking auth middleware... found issue
@@ -125,6 +129,7 @@ Agents spawn automatically based on your request:
 ```
 
 **You say:** "Review my changes"
+
 ```
 [code-reviewer agent activated]
 → Analyzing 3 files changed...
@@ -134,6 +139,7 @@ Agents spawn automatically based on your request:
 ```
 
 **You say:** "Add authentication to the API"
+
 ```
 [orchestrator agent activated]
 → Breaking down into subtasks:
@@ -149,6 +155,7 @@ Agents spawn automatically based on your request:
 Skills provide domain knowledge automatically:
 
 **You ask:** "How should I structure the payment service?"
+
 ```
 [designing-architecture skill applied]
 → Recommending hexagonal architecture
@@ -157,6 +164,7 @@ Skills provide domain knowledge automatically:
 ```
 
 **You ask:** "Make this endpoint faster"
+
 ```
 [optimizing-performance skill applied]
 → Adding database indexes
@@ -169,6 +177,7 @@ Skills provide domain knowledge automatically:
 Hooks run automatically on events:
 
 **Security block (pre-edit):**
+
 ```
 ⛔ BLOCKED: Potential secret detected
    File: src/config.ts, Line 5
@@ -178,12 +187,14 @@ Hooks run automatically on events:
 ```
 
 **Auto-format (post-edit):**
+
 ```
 ✓ Formatted with prettier: src/components/Button.tsx
 ✓ Formatted with black: scripts/deploy.py
 ```
 
 **Desktop notifications:**
+
 ```
 🔔 "Claude needs input" - when waiting for your response
 🔔 "Task complete" - when finished
@@ -197,35 +208,35 @@ All commands use the format `/project-starter:<command>`.
 
 ### Output Styles
 
-| Command | Mode |
-|---------|------|
+| Command                      | Mode                                          |
+| ---------------------------- | --------------------------------------------- |
 | `/project-starter:architect` | System design mode - architecture before code |
-| `/project-starter:rapid` | Fast development - ship quickly, iterate |
-| `/project-starter:mentor` | Teaching mode - explain the "why" |
-| `/project-starter:review` | Code review mode - strict quality |
+| `/project-starter:rapid`     | Fast development - ship quickly, iterate      |
+| `/project-starter:mentor`    | Teaching mode - explain the "why"             |
+| `/project-starter:review`    | Code review mode - strict quality             |
 
 ### Git Workflow (Inner-Loop)
 
-| Command | Purpose |
-|---------|---------|
-| `/project-starter:commit` | Auto-generate conventional commit message |
-| `/project-starter:commit-push-pr` | Commit → Push → Create PR (full workflow) |
-| `/project-starter:quick-fix` | Fast fix for lint/type errors |
-| `/project-starter:add-tests` | Generate tests for recent changes |
-| `/project-starter:lint-fix` | Auto-fix all linting issues |
-| `/project-starter:sync-branch` | Sync with main (rebase or merge) |
-| `/project-starter:summarize-changes` | Generate standup/PR summaries |
+| Command                              | Purpose                                   |
+| ------------------------------------ | ----------------------------------------- |
+| `/project-starter:commit`            | Auto-generate conventional commit message |
+| `/project-starter:commit-push-pr`    | Commit → Push → Create PR (full workflow) |
+| `/project-starter:quick-fix`         | Fast fix for lint/type errors             |
+| `/project-starter:add-tests`         | Generate tests for recent changes         |
+| `/project-starter:lint-fix`          | Auto-fix all linting issues               |
+| `/project-starter:sync-branch`       | Sync with main (rebase or merge)          |
+| `/project-starter:summarize-changes` | Generate standup/PR summaries             |
 
 ### Verification
 
-| Command | Purpose |
-|---------|---------|
-| `/project-starter:verify-changes` | Multi-subagent adversarial verification |
-| `/project-starter:validate-build` | Build process validation |
-| `/project-starter:run-tests` | Tiered test execution |
-| `/project-starter:lint-check` | Code quality checks |
-| `/project-starter:security-scan` | Security vulnerability detection |
-| `/project-starter:code-simplifier` | Post-implementation cleanup |
+| Command                            | Purpose                                 |
+| ---------------------------------- | --------------------------------------- |
+| `/project-starter:verify-changes`  | Multi-subagent adversarial verification |
+| `/project-starter:validate-build`  | Build process validation                |
+| `/project-starter:run-tests`       | Tiered test execution                   |
+| `/project-starter:lint-check`      | Code quality checks                     |
+| `/project-starter:security-scan`   | Security vulnerability detection        |
+| `/project-starter:code-simplifier` | Post-implementation cleanup             |
 
 ---
 
@@ -233,15 +244,15 @@ All commands use the format `/project-starter:<command>`.
 
 Agents are specialized subagents that Claude spawns automatically based on your task.
 
-| Agent | Purpose | Auto-Triggers |
-|-------|---------|---------------|
-| `orchestrator` | Coordinate multi-step tasks | "improve", "refactor", multi-module changes |
-| `code-reviewer` | Review code quality | After code changes, before commits |
-| `debugger` | Systematic bug investigation | Errors, test failures, crashes |
-| `docs-writer` | Technical documentation | README, API docs, guides |
-| `security-auditor` | Security vulnerability detection | Auth, user input, sensitive data |
-| `refactorer` | Code structure improvements | Technical debt, cleanup |
-| `test-architect` | Design test strategies | Adding/improving tests |
+| Agent              | Purpose                          | Auto-Triggers                               |
+| ------------------ | -------------------------------- | ------------------------------------------- |
+| `orchestrator`     | Coordinate multi-step tasks      | "improve", "refactor", multi-module changes |
+| `code-reviewer`    | Review code quality              | After code changes, before commits          |
+| `debugger`         | Systematic bug investigation     | Errors, test failures, crashes              |
+| `docs-writer`      | Technical documentation          | README, API docs, guides                    |
+| `security-auditor` | Security vulnerability detection | Auth, user input, sensitive data            |
+| `refactorer`       | Code structure improvements      | Technical debt, cleanup                     |
+| `test-architect`   | Design test strategies           | Adding/improving tests                      |
 
 ---
 
@@ -249,14 +260,14 @@ Agents are specialized subagents that Claude spawns automatically based on your 
 
 Skills are knowledge domains that Claude uses autonomously when relevant.
 
-| Skill | Domain |
-|-------|--------|
-| `analyzing-projects` | Understand codebase structure and patterns |
-| `designing-tests` | Unit, integration, E2E test approaches |
-| `designing-architecture` | Clean Architecture, Hexagonal, etc. |
+| Skill                    | Domain                                      |
+| ------------------------ | ------------------------------------------- |
+| `analyzing-projects`     | Understand codebase structure and patterns  |
+| `designing-tests`        | Unit, integration, E2E test approaches      |
+| `designing-architecture` | Clean Architecture, Hexagonal, etc.         |
 | `optimizing-performance` | Speed up applications, identify bottlenecks |
-| `managing-git` | Version control, conventional commits |
-| `designing-apis` | REST/GraphQL patterns and best practices |
+| `managing-git`           | Version control, conventional commits       |
+| `designing-apis`         | REST/GraphQL patterns and best practices    |
 
 ---
 
@@ -264,17 +275,17 @@ Skills are knowledge domains that Claude uses autonomously when relevant.
 
 Hooks run automatically on specific events.
 
-| Hook | Trigger | Action |
-|------|---------|--------|
-| Security scan | Edit/Write | Blocks commits with potential secrets |
-| File protection | Edit/Write | Blocks edits to lock files, .env, .git |
-| Auto-format | Edit/Write | Runs prettier/black/gofmt by file type |
-| Command logging | Bash | Logs to `.claude/command-history.log` |
-| Environment check | Session start | Validates Node.js, Python, Git |
-| Prompt analysis | User prompt | Suggests appropriate agents |
-| Auto-verify | Task complete | Runs tests/lint, reports results |
-| Input notification | Input needed | Desktop notification |
-| Complete notification | Task complete | Desktop notification |
+| Hook                  | Trigger       | Action                                 |
+| --------------------- | ------------- | -------------------------------------- |
+| Security scan         | Edit/Write    | Blocks commits with potential secrets  |
+| File protection       | Edit/Write    | Blocks edits to lock files, .env, .git |
+| Auto-format           | Edit/Write    | Runs prettier/black/gofmt by file type |
+| Command logging       | Bash          | Logs to `.claude/command-history.log`  |
+| Environment check     | Session start | Validates Node.js, Python, Git         |
+| Prompt analysis       | User prompt   | Suggests appropriate agents            |
+| Auto-verify           | Task complete | Runs tests/lint, reports results       |
+| Input notification    | Input needed  | Desktop notification                   |
+| Complete notification | Task complete | Desktop notification                   |
 
 ---
 
@@ -300,6 +311,7 @@ cp templates/CLAUDE.md.template /path/to/your/project/CLAUDE.md
 ```
 
 Then customize with your:
+
 - Package manager commands
 - Test/build/lint commands
 - Code conventions
@@ -325,16 +337,19 @@ claude /install-github-action
 ```
 
 This enables:
+
 - Tag `@claude` in PR comments to get code suggestions
 - Auto-update `CLAUDE.md` during code review
 - Claude responds to review feedback automatically
 
 **Example PR comment:**
+
 ```
 @claude please add input validation to the email field
 ```
 
 **Team workflow tip:** Use `@claude` to update your `CLAUDE.md` with learnings from code review:
+
 ```
 @claude add a note to CLAUDE.md that we should always validate email format before API calls
 ```
@@ -461,6 +476,10 @@ Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md).
 5. Open a Pull Request
 
 ---
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=CloudAI-X/claude-workflow-v2&type=date&legend=top-left)](https://www.star-history.com/#CloudAI-X/claude-workflow-v2&type=date&legend=top-left)
 
 ## Credits
 
