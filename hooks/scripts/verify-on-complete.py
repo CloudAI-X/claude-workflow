@@ -16,6 +16,7 @@ Exit codes:
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -25,11 +26,7 @@ def run_command(cmd: list[str], timeout: int = 30) -> tuple[bool, str]:
     """Run a command and return (success, output)."""
     try:
         result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            cwd=os.getcwd()
+            cmd, capture_output=True, text=True, timeout=timeout, cwd=os.getcwd()
         )
         return result.returncode == 0, result.stdout + result.stderr
     except subprocess.TimeoutExpired:
@@ -120,7 +117,7 @@ def check_git_status() -> tuple[bool, str]:
         return True, "Not a git repository"
 
     if output.strip():
-        lines = output.strip().split('\n')
+        lines = output.strip().split("\n")
         return False, f"{len(lines)} uncommitted change(s)"
     return True, "Working tree clean"
 
@@ -133,13 +130,14 @@ def send_notification(title: str, message: str, is_error: bool = False):
     if sys.platform == "darwin":
         script = f'display notification "{message}" with title "{title}" sound name "{sound}"'
         subprocess.run(["osascript", "-e", script], capture_output=True)
-    # Linux
+    # Linux - only if notify-send is available (not present in WSL/headless)
     elif sys.platform.startswith("linux"):
-        urgency = "critical" if is_error else "normal"
-        subprocess.run(
-            ["notify-send", title, message, f"--urgency={urgency}"],
-            capture_output=True
-        )
+        if shutil.which("notify-send"):
+            urgency = "critical" if is_error else "normal"
+            subprocess.run(
+                ["notify-send", title, message, f"--urgency={urgency}"],
+                capture_output=True,
+            )
 
 
 def main():
