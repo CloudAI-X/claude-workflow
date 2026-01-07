@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-01-07
+
+### Added
+
+- **Parallel Execution Support**
+  - Orchestrator can now spawn N subagents simultaneously for N independent tasks
+  - Uses `run_in_background: true` with Task tool for concurrent execution
+  - Results collected via TaskOutput after all agents complete
+  - Roughly Nx faster than sequential execution
+
+- **New Commands**
+  - `/project-starter:parallel-review` - Review multiple directories in parallel
+  - `/project-starter:parallel-analyze` - Analyze code from architecture, security, performance, and testing perspectives simultaneously
+
+- **New Skill**
+  - `parallel-execution` - Patterns for spawning dynamic subagents, best practices for parallelization, and TodoWrite integration
+
+### Changed
+
+- Updated orchestrator agent with Parallel Execution Protocol section
+- Enhanced verify-changes command with explicit parallel syntax
+- Added parallel execution examples and diagrams to documentation
+
+---
+
 ## [1.0.0] - 2025-01-01
 
 ### Added
