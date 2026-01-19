@@ -138,22 +138,73 @@ PR Checklist:
 ## Common Git Commands
 
 ### Daily Workflow
+
+**CRITICAL: Always start branches from `origin/main`, not local `main`**
+
+This prevents:
+- PRs containing commits from other branches
+- Merge conflicts due to stale local main
+- Messy PR history
+
 ```bash
-# Start new feature
-git checkout main
-git pull
-git checkout -b feature/TICKET-123-description
+# ================================================================
+# START NEW FEATURE (Always from origin/main!)
+# ================================================================
 
-# Commit changes
+# Step 1: Fetch latest from origin (REQUIRED)
+git fetch origin
+
+# Step 2: Create branch directly from origin/main
+# Use the Linear-generated branch name from the ticket
+git checkout -b daweido/eng-123-add-feature origin/main
+
+# WRONG ✗ - Don't do this! Local main may be stale
+# git checkout main && git pull && git checkout -b branch-name
+
+# ================================================================
+# IF YOU HAVE UNCOMMITTED CHANGES
+# ================================================================
+git stash push -m "WIP"
+git fetch origin
+git checkout -b daweido/eng-123-add-feature origin/main
+git stash pop
+
+# ================================================================
+# COMMIT CHANGES
+# ================================================================
 git add -p  # Stage interactively
-git commit -m "feat: description"
+git commit -m "feat(scope): description"
 
-# Keep up with main
-git fetch origin main
+# ================================================================
+# BEFORE PUSHING: Sync with main to avoid conflicts
+# ================================================================
+git fetch origin
 git rebase origin/main
+# If conflicts: resolve, then `git rebase --continue`
 
-# Push and create PR
+# ================================================================
+# PUSH AND CREATE PR
+# ================================================================
 git push -u origin HEAD
+gh pr create --fill
+```
+
+### Branch Dependencies (When Feature B Depends on Feature A)
+
+**Option 1: Wait for merge (Recommended)**
+```bash
+# Wait for feature-a to be merged, then start fresh
+git fetch origin
+git checkout -b daweido/eng-456-feature-b origin/main
+```
+
+**Option 2: Branch from unmerged branch (Creates messy history)**
+```bash
+# This WILL include feature-a commits in feature-b PR
+# After feature-a merges, you MUST rebase feature-b:
+git fetch origin
+git rebase origin/main
+git push --force-with-lease
 ```
 
 ### Fixing Mistakes
