@@ -30,7 +30,7 @@ Error Handling Progress:
 ### JavaScript / TypeScript
 
 ```typescript
-// Define custom error hierarchy
+// Custom error hierarchy
 class AppError extends Error {
   constructor(
     message: string,
@@ -40,16 +40,13 @@ class AppError extends Error {
   ) {
     super(message);
     this.name = this.constructor.name;
-    Error.captureStackTrace(this, this.constructor);
   }
 }
-
 class NotFoundError extends AppError {
   constructor(resource: string, id: string) {
     super(`${resource} with id ${id} not found`, 404, "NOT_FOUND");
   }
 }
-
 class ValidationError extends AppError {
   constructor(public errors: Record<string, string[]>) {
     super("Validation failed", 400, "VALIDATION_ERROR");
@@ -92,7 +89,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
       code: err.code,
       statusCode: err.statusCode,
       path: req.path,
-      method: req.method,
     });
     return res.status(err.statusCode).json({
       error: { code: err.code, message: err.message },
@@ -198,7 +194,6 @@ if errors.As(err, &valErr) {
 ```typescript
 // WRONG: Unstructured string logs
 console.log(`User ${userId} created order ${orderId} at ${new Date()}`);
-// Output: "User 123 created order 456 at Mon Jan 15 2024..."
 // Impossible to parse, filter, or aggregate
 
 // CORRECT: Structured JSON logs
@@ -211,7 +206,6 @@ const logger = pino({
   },
   redact: ["req.headers.authorization", "password", "ssn"],
 });
-
 logger.info({
   event: "order_created",
   userId: "123",
@@ -275,23 +269,17 @@ class ErrorBoundary extends React.Component<
   { hasError: boolean; error?: Error }
 > {
   state = { hasError: false, error: undefined };
-
   static getDerivedStateFromError(error: Error) {
     return { hasError: true, error };
   }
-
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     logger.error("React error boundary caught error", {
       error: error.message,
       componentStack: info.componentStack,
     });
   }
-
   render() {
-    if (this.state.hasError) {
-      return this.props.fallback;
-    }
-    return this.props.children;
+    return this.state.hasError ? this.props.fallback : this.props.children;
   }
 }
 
@@ -341,7 +329,6 @@ async function withRetry<T>(
     maxDelay = 30000,
     retryOn,
   } = options;
-
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
@@ -353,20 +340,15 @@ async function withRetry<T>(
         baseDelay * 2 ** attempt + Math.random() * 1000,
         maxDelay,
       );
-      logger.warn("Retrying operation", {
-        attempt: attempt + 1,
-        delay,
-        error: (error as Error).message,
-      });
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      logger.warn("Retrying operation", { attempt: attempt + 1, delay });
+      await new Promise((r) => setTimeout(r, delay));
     }
   }
   throw new Error("Unreachable");
 }
 
-// Usage
+// Usage: retry only on transient errors
 const data = await withRetry(() => fetch("https://api.example.com/data"), {
-  maxRetries: 3,
   retryOn: (err) => err.message.includes("ECONNRESET"),
 });
 ```
@@ -396,30 +378,20 @@ class CircuitBreaker {
 
     try {
       const result = await fn();
-      this.onSuccess();
+      this.failures = 0;
+      this.state = "closed";
       return result;
     } catch (error) {
-      this.onFailure();
+      this.failures++;
+      this.lastFailure = Date.now();
+      if (this.failures >= this.threshold) this.state = "open";
       if (fallback) return fallback();
       throw error;
     }
   }
-
-  private onSuccess() {
-    this.failures = 0;
-    this.state = "closed";
-  }
-
-  private onFailure() {
-    this.failures++;
-    this.lastFailure = Date.now();
-    if (this.failures >= this.threshold) {
-      this.state = "open";
-    }
-  }
 }
 
-// Usage
+// Usage: trips open after 5 failures, resets after 30s
 const paymentCircuit = new CircuitBreaker(5, 30000);
 const result = await paymentCircuit.execute(
   () => paymentService.charge(amount),
@@ -440,17 +412,12 @@ Sentry.init({
   tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
   beforeSend(event) {
     // Scrub sensitive data
-    if (event.request?.headers) {
-      delete event.request.headers["authorization"];
-    }
+    if (event.request?.headers) delete event.request.headers["authorization"];
     return event;
   },
 });
 
-// Add user context
 Sentry.setUser({ id: user.id, email: user.email });
-
-// Capture with extra context
 Sentry.captureException(error, {
   tags: { subsystem: "payment", provider: "stripe" },
   extra: { orderId, amount },

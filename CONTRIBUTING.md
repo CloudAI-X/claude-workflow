@@ -94,7 +94,7 @@ keep-coding-instructions: true
 
 ### Adding Hooks
 
-1. Add the hook script to `hooks/scripts/`
+1. Add the hook script to `hooks/`
 2. Register in `hooks/hooks.json`
 3. Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths
 4. Exit codes: `0` = allow, `2` = block with message
@@ -105,7 +105,7 @@ keep-coding-instructions: true
 {
   "type": "PreToolUse",
   "matcher": "^Edit|Write$",
-  "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/my-hook.sh"
+  "command": "${CLAUDE_PLUGIN_ROOT}/hooks/my-hook.sh"
 }
 ```
 

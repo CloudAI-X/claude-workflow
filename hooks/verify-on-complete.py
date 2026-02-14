@@ -140,6 +140,23 @@ def send_notification(title: str, message: str, is_error: bool = False):
             )
 
 
+def has_code_changes() -> bool:
+    """Check if there are any code changes worth verifying."""
+    success, output = run_command(["git", "diff", "--name-only", "HEAD"], timeout=5)
+    if not success or not output.strip():
+        # Also check staged changes
+        success2, output2 = run_command(["git", "diff", "--name-only", "--cached"], timeout=5)
+        if not success2 or not output2.strip():
+            return False
+        output = output2
+    # Check if any changed files are code (not just docs/config)
+    code_extensions = {'.py', '.js', '.ts', '.tsx', '.jsx', '.go', '.rs', '.java', '.rb', '.c', '.cpp', '.h'}
+    for line in output.strip().split("\n"):
+        if any(line.endswith(ext) for ext in code_extensions):
+            return True
+    return False
+
+
 def main():
     """Run verification checks on task completion."""
     results = []
@@ -149,25 +166,29 @@ def main():
     git_ok, git_msg = check_git_status()
     results.append(f"{'✓' if git_ok else '!'} Git: {git_msg}")
 
-    # 2. Run tests if available (with short timeout)
-    test_cmd = get_test_command()
-    if test_cmd:
-        test_ok, test_output = run_command(test_cmd, timeout=60)
-        if test_ok:
-            results.append("✓ Tests: passed")
-        else:
-            results.append("✗ Tests: failed")
-            has_failures = True
+    # 2. Only run tests/lint if there are actual code changes
+    if has_code_changes():
+        # Run tests if available (with short timeout)
+        test_cmd = get_test_command()
+        if test_cmd:
+            test_ok, test_output = run_command(test_cmd, timeout=15)
+            if test_ok:
+                results.append("✓ Tests: passed")
+            else:
+                results.append("✗ Tests: failed")
+                has_failures = True
 
-    # 3. Run lint if available (quick check)
-    lint_cmd = get_lint_command()
-    if lint_cmd:
-        lint_ok, lint_output = run_command(lint_cmd, timeout=30)
-        if lint_ok:
-            results.append("✓ Lint: passed")
-        else:
-            results.append("⚠ Lint: issues found")
-            # Lint warnings don't count as failures
+        # Run lint if available (quick check)
+        lint_cmd = get_lint_command()
+        if lint_cmd:
+            lint_ok, lint_output = run_command(lint_cmd, timeout=10)
+            if lint_ok:
+                results.append("✓ Lint: passed")
+            else:
+                results.append("⚠ Lint: issues found")
+                # Lint warnings don't count as failures
+    else:
+        results.append("- Tests/Lint: skipped (no code changes)")
 
     # Send notification with results
     if results:

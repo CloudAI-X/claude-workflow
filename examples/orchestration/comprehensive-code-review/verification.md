@@ -37,6 +37,7 @@ Review this file for quality issues: README.md
 ```
 
 **Expected:**
+
 - code-reviewer agent activates
 - Provides feedback on the README
 
@@ -45,11 +46,12 @@ Review this file for quality issues: README.md
 Run the full comprehensive review:
 
 ```
-Review the hooks/scripts directory comprehensively.
+Review the hooks directory comprehensively.
 Check code quality, security, and documentation.
 ```
 
 **Expected:**
+
 - Orchestrator creates a plan
 - Multiple agents activate in sequence
 - Final summary is provided
@@ -77,11 +79,13 @@ Expected: A structured list of review tasks.
 **Symptom:** Orchestrator doesn't spawn specialist agents.
 
 **Causes:**
+
 - Task tool not available to orchestrator
 - Agent files not in correct location
 - Plugin not properly loaded
 
 **Fix:**
+
 ```bash
 # Verify plugin structure
 ls agents/
@@ -96,11 +100,13 @@ ls agents/
 **Symptom:** Agent activates but produces no output.
 
 **Causes:**
+
 - Model quota exceeded
 - Network timeout
 - Invalid agent configuration
 
 **Fix:**
+
 - Check Claude Code logs for errors
 - Try a simpler prompt
 - Verify agent .md file has valid frontmatter
@@ -110,11 +116,13 @@ ls agents/
 **Symptom:** Review stops partway through.
 
 **Causes:**
+
 - Context limit reached
 - User interrupted
 - Error in one agent
 
 **Fix:**
+
 - Ask: "Continue the review from where you left off"
 - Or: "Complete the remaining review tasks"
 
@@ -125,7 +133,7 @@ When working correctly, you should see output similar to:
 ```
 [orchestrator agent activated]
 
-I'll coordinate a comprehensive review of hooks/scripts.
+I'll coordinate a comprehensive review of hooks.
 
 Creating review plan...
 
@@ -139,7 +147,7 @@ Starting code quality review...
 
 [code-reviewer agent activated]
 
-Reviewing 4 Python files in hooks/scripts/...
+Reviewing 4 Python files in hooks/...
 
 ## Code Review Findings
 

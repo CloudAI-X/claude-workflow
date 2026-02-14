@@ -4,7 +4,7 @@ description: Code refactoring specialist for improving code quality, reducing te
 tools: Read, Write, Edit, Glob, Grep, Bash
 model: sonnet
 permissionMode: acceptEdits
-skills: architecture-patterns
+skills: designing-architecture
 ---
 
 # Refactorer Agent

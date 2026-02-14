@@ -27,7 +27,7 @@
    - Include trigger keywords in description
    - Make content language-agnostic where possible
 
-4. **When adding hooks** (`hooks/scripts/*`):
+4. **When adding hooks** (`hooks/*`):
    - Register in `hooks/hooks.json`
    - Use `${CLAUDE_PLUGIN_ROOT}` for paths
    - Exit codes: 0 = allow, 2 = block with message
@@ -40,17 +40,20 @@
 ## Code Conventions
 
 ### Markdown Files
+
 - Use YAML frontmatter for metadata
 - Consistent heading hierarchy (# > ## > ###)
 - Code blocks with language specifiers
 
 ### Python Hooks
+
 - Use `#!/usr/bin/env python3` shebang
 - Read input from stdin as JSON
 - Handle all exceptions silently (don't block operations)
 - Use subprocess.run with timeout
 
 ### JSON Files
+
 - 2-space indentation
 - No trailing commas
 - Validate syntax before committing
@@ -58,7 +61,9 @@
 ## Git Workflow
 
 ### Commit Messages
+
 Follow Conventional Commits:
+
 ```
 feat: add new agent for X
 fix: correct hook exit code handling
@@ -67,6 +72,7 @@ chore: bump version to X.Y.Z
 ```
 
 ### Branching
+
 - `main` is always deployable
 - Feature branches: `feature/description`
 - Bug fixes: `fix/description`
@@ -75,19 +81,20 @@ chore: bump version to X.Y.Z
 
 When working on this repo, leverage the plugin's own agents:
 
-| Task | Agent to Use |
-|------|--------------|
-| Multi-file changes | `orchestrator` |
-| Code quality check | `code-reviewer` |
-| Bug investigation | `debugger` |
-| Update docs | `docs-writer` |
-| Security review | `security-auditor` |
-| Clean up code | `refactorer` |
-| Add tests | `test-architect` |
+| Task               | Agent to Use       |
+| ------------------ | ------------------ |
+| Multi-file changes | `orchestrator`     |
+| Code quality check | `code-reviewer`    |
+| Bug investigation  | `debugger`         |
+| Update docs        | `docs-writer`      |
+| Security review    | `security-auditor` |
+| Clean up code      | `refactorer`       |
+| Add tests          | `test-architect`   |
 
 ## Common Patterns
 
 ### Hook Script Template
+
 ```python
 #!/usr/bin/env python3
 import json
@@ -107,6 +114,7 @@ if __name__ == '__main__':
 ```
 
 ### Agent Definition Template
+
 ```markdown
 ---
 name: agent-name
@@ -123,6 +131,7 @@ model: sonnet
 ## Testing Checklist
 
 Before pushing:
+
 - [ ] `claude plugin validate` passes
 - [ ] Tested feature manually with Claude Code
 - [ ] No hardcoded paths (use `${CLAUDE_PLUGIN_ROOT}`)
@@ -132,16 +141,19 @@ Before pushing:
 ## Troubleshooting
 
 ### Hook not executing
+
 - Check `hooks/hooks.json` matcher regex
 - Verify script has executable permissions (`chmod +x`)
 - Check Python path (`#!/usr/bin/env python3`)
 
 ### Agent not triggering
+
 - Ensure "PROACTIVELY" is in description
 - Check trigger keywords are in user's prompt
 - Verify model name is valid (opus/sonnet/haiku)
 
 ### Validation failing
+
 - Run `claude plugin validate` for specific errors
 - Check JSON syntax in all config files
 - Verify all referenced files exist

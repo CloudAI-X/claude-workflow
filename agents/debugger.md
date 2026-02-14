@@ -4,7 +4,7 @@ description: Expert debugging specialist for errors, test failures, crashes, seg
 tools: Read, Edit, Bash, Grep, Glob, Write
 model: sonnet
 permissionMode: acceptEdits
-skills: performance-optimization, error-handling
+skills: optimizing-performance, error-handling
 ---
 
 # Debugger Agent

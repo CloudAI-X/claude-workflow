@@ -4,7 +4,7 @@ description: Security specialist for vulnerability detection, secure coding revi
 tools: Read, Grep, Glob, Bash
 model: sonnet
 permissionMode: default
-skills: api-design, security-patterns
+skills: designing-apis, security-patterns
 ---
 
 # Security Auditor Agent

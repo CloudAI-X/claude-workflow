@@ -4,7 +4,7 @@ description: Master coordinator for complex multi-step tasks. Use PROACTIVELY wh
 tools: Read, Write, Edit, Glob, Grep, Bash, Task, TodoWrite, TaskOutput
 model: opus
 permissionMode: default
-skills: project-analysis, architecture-patterns, parallel-execution
+skills: analyzing-projects, designing-architecture, parallel-execution
 ---
 
 # Orchestrator Agent

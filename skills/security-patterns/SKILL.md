@@ -33,37 +33,28 @@ Security Implementation Progress:
 ```typescript
 import jwt from "jsonwebtoken";
 
-// Token creation
 function generateTokens(user: User) {
   const accessToken = jwt.sign(
     { sub: user.id, role: user.role },
     process.env.JWT_SECRET!,
-    { expiresIn: "15m", algorithm: "HS256" }, // short-lived
+    { expiresIn: "15m", algorithm: "HS256" },
   );
-
   const refreshToken = jwt.sign(
     { sub: user.id, tokenVersion: user.tokenVersion },
     process.env.JWT_REFRESH_SECRET!,
     { expiresIn: "7d" },
   );
-
   return { accessToken, refreshToken };
 }
 
-// WRONG: Storing JWT in localStorage (XSS vulnerable)
-localStorage.setItem("token", accessToken);
-
-// CORRECT: Store refresh token in httpOnly cookie
+// WRONG: localStorage (XSS vulnerable) | CORRECT: httpOnly cookie for refresh, memory for access
 res.cookie("refreshToken", refreshToken, {
-  httpOnly: true, // not accessible via JavaScript
-  secure: true, // HTTPS only
-  sameSite: "strict", // CSRF protection
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  path: "/api/auth/refresh", // only sent to refresh endpoint
+  httpOnly: true,
+  secure: true,
+  sameSite: "strict",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  path: "/api/auth/refresh",
 });
-
-// Access token: keep in memory (variable), send via Authorization header
-// When access token expires, use refresh token to get new one
 ```
 
 ### JWT Verification Middleware
@@ -115,46 +106,31 @@ app.use(
 
 ```
 Authorization Code Flow (web apps with backend):
-1. User clicks "Login with Google"
-2. Redirect to provider: /authorize?response_type=code&client_id=...&redirect_uri=...&scope=openid email
-3. User authenticates with provider
-4. Provider redirects back with ?code=AUTHORIZATION_CODE
-5. Backend exchanges code for tokens (POST /token with client_secret)
-6. Backend receives access_token + id_token
-7. Backend creates session or JWT for the user
+1. Redirect to provider: /authorize?response_type=code&client_id=...&redirect_uri=...&scope=openid email
+2. User authenticates, provider redirects back with ?code=AUTHORIZATION_CODE
+3. Backend exchanges code for tokens (POST /token with client_secret)
+4. Backend receives access_token + id_token, creates session/JWT
 
-PKCE Flow (SPAs, mobile apps -- no client_secret):
-Same as above but with code_verifier/code_challenge instead of client_secret
-
+PKCE Flow (SPAs, mobile): Same but with code_verifier/code_challenge instead of client_secret
 NEVER use Implicit Flow (deprecated, tokens exposed in URL)
 ```
 
 ### API Key Authentication
 
 ```typescript
-// API keys for service-to-service or developer APIs
 async function authenticateApiKey(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
   const apiKey = req.headers["x-api-key"] as string;
-  if (!apiKey) {
-    return res.status(401).json({ error: "API key required" });
-  }
+  if (!apiKey) return res.status(401).json({ error: "API key required" });
 
-  // WRONG: Direct string comparison (timing attack vulnerable)
-  // if (apiKey === storedKey) { ... }
-
-  // CORRECT: Hash the key and look up by hash
+  // WRONG: Direct comparison (timing attack) | CORRECT: Hash-based lookup
   const hashedKey = crypto.createHash("sha256").update(apiKey).digest("hex");
-  const keyRecord = await db.apiKey.findUnique({
-    where: { hash: hashedKey },
-  });
-
-  if (!keyRecord || keyRecord.revokedAt) {
+  const keyRecord = await db.apiKey.findUnique({ where: { hash: hashedKey } });
+  if (!keyRecord || keyRecord.revokedAt)
     return res.status(401).json({ error: "Invalid API key" });
-  }
 
   req.apiClient = { id: keyRecord.clientId, scopes: keyRecord.scopes };
   next();
@@ -166,7 +142,6 @@ async function authenticateApiKey(
 ### RBAC (Role-Based Access Control)
 
 ```typescript
-// Define permissions per role
 const PERMISSIONS = {
   admin: [
     "users:read",
@@ -184,42 +159,23 @@ type Role = keyof typeof PERMISSIONS;
 
 function authorize(...requiredPermissions: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const userRole = req.user.role as Role;
-    const userPermissions = PERMISSIONS[userRole] || [];
+    const userPermissions = PERMISSIONS[req.user.role as Role] || [];
     const hasPermission = requiredPermissions.every((p) =>
       (userPermissions as readonly string[]).includes(p),
     );
-
-    if (!hasPermission) {
+    if (!hasPermission)
       return res.status(403).json({ error: "Insufficient permissions" });
-    }
     next();
   };
 }
 
-// Usage
-app.delete(
-  "/api/users/:id",
-  authenticate,
-  authorize("users:delete"),
-  deleteUser,
-);
+// Usage: app.delete("/api/users/:id", authenticate, authorize("users:delete"), deleteUser);
 ```
 
 ### Resource-Level Authorization
 
 ```typescript
-// WRONG: Only checking role, not ownership
-app.put(
-  "/api/posts/:id",
-  authenticate,
-  authorize("posts:write"),
-  async (req, res) => {
-    await db.post.update({ where: { id: req.params.id }, data: req.body });
-    // Any editor can edit ANY post!
-  },
-);
-
+// WRONG: Only checking role, not ownership -- any editor can edit ANY post
 // CORRECT: Check ownership or admin role
 app.put(
   "/api/posts/:id",
@@ -228,7 +184,6 @@ app.put(
   async (req, res) => {
     const post = await db.post.findUnique({ where: { id: req.params.id } });
     if (!post) return res.status(404).json({ error: "Not found" });
-
     if (post.authorId !== req.user.id && req.user.role !== "admin") {
       return res
         .status(403)
@@ -243,20 +198,13 @@ app.put(
 
 ```typescript
 import bcrypt from "bcrypt";
-
-// WRONG: Storing plaintext
-await db.user.create({ data: { email, password } });
-
-// WRONG: Using MD5 or SHA256 (too fast, vulnerable to brute force)
-const hash = crypto.createHash("sha256").update(password).digest("hex");
-
+// WRONG: plaintext or MD5/SHA256 (too fast, brute-forceable)
 // CORRECT: bcrypt with appropriate cost factor
 const SALT_ROUNDS = 12; // ~250ms on modern hardware
 
 async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, SALT_ROUNDS);
 }
-
 async function verifyPassword(
   password: string,
   hash: string,
@@ -265,14 +213,13 @@ async function verifyPassword(
 }
 
 // Registration
-const hashedPw = await hashPassword(req.body.password);
-await db.user.create({ data: { email, password: hashedPw } });
+await db.user.create({
+  data: { email, password: await hashPassword(req.body.password) },
+});
 
-// Login -- use generic error message
+// Login -- WRONG: "Invalid password" (reveals email exists) | CORRECT: generic message
 const user = await db.user.findUnique({ where: { email } });
 if (!user || !(await verifyPassword(req.body.password, user.password))) {
-  // WRONG: "Invalid password" (reveals that email exists)
-  // CORRECT: Generic message
   return res.status(401).json({ error: "Invalid email or password" });
 }
 ```
@@ -329,7 +276,7 @@ Never: Rotate in-place without a transition period
 ### In Transit
 
 ```typescript
-// HTTPS everywhere (redirect HTTP to HTTPS)
+// Redirect HTTP to HTTPS in production
 app.use((req, res, next) => {
   if (
     req.headers["x-forwarded-proto"] !== "https" &&
@@ -339,8 +286,7 @@ app.use((req, res, next) => {
   }
   next();
 });
-
-// HSTS header (tell browsers to always use HTTPS)
+// HSTS header
 app.use((req, res, next) => {
   res.setHeader(
     "Strict-Transport-Security",
@@ -354,7 +300,6 @@ app.use((req, res, next) => {
 
 ```typescript
 import crypto from "crypto";
-
 const ALGORITHM = "aes-256-gcm";
 
 function encrypt(
@@ -363,8 +308,8 @@ function encrypt(
 ): { ciphertext: string; iv: string; tag: string } {
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
-  let ciphertext = cipher.update(plaintext, "utf8", "hex");
-  ciphertext += cipher.final("hex");
+  let ciphertext =
+    cipher.update(plaintext, "utf8", "hex") + cipher.final("hex");
   return {
     ciphertext,
     iv: iv.toString("hex"),
@@ -384,13 +329,9 @@ function decrypt(
     Buffer.from(iv, "hex"),
   );
   decipher.setAuthTag(Buffer.from(tag, "hex"));
-  let plaintext = decipher.update(ciphertext, "hex", "utf8");
-  plaintext += decipher.final("utf8");
-  return plaintext;
+  return decipher.update(ciphertext, "hex", "utf8") + decipher.final("utf8");
 }
-
-// Use for PII, sensitive data in database
-// Encryption key stored in secrets manager, NOT in code
+// Use for PII, sensitive data. Encryption key in secrets manager, NOT in code.
 ```
 
 ## CORS Configuration
