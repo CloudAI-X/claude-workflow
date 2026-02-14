@@ -1,6 +1,6 @@
 {
   "name": "install-claude-workflow-v2",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "type": "commonjs",
   "description": "Install the Claude Code workflow plugin with agents, commands, skills, and hooks",
   "bin": {
