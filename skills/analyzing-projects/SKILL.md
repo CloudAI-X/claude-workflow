@@ -5,6 +5,11 @@ description: Analyzes codebases to understand structure, tech stack, patterns, a
 
 # Analyzing Projects
 
+### When to Load
+
+- **Trigger**: Onboarding to a new project, "how does this work" questions, codebase exploration, understanding unfamiliar code
+- **Skip**: Already familiar with the project structure and patterns
+
 ## Project Analysis Workflow
 
 Copy this checklist and track progress:
@@ -30,6 +35,7 @@ cat README.md 2>/dev/null | head -50
 ## Step 2: Tech Stack Detection
 
 ### Package Managers & Dependencies
+
 - `package.json` → Node.js/JavaScript/TypeScript
 - `requirements.txt` / `pyproject.toml` / `setup.py` → Python
 - `go.mod` → Go
@@ -38,11 +44,13 @@ cat README.md 2>/dev/null | head -50
 - `Gemfile` → Ruby
 
 ### Frameworks (from dependencies)
+
 - React, Vue, Angular, Next.js, Nuxt
 - Express, FastAPI, Django, Flask, Rails
 - Spring Boot, Gin, Echo
 
 ### Infrastructure
+
 - `Dockerfile`, `docker-compose.yml` → Containerized
 - `kubernetes/`, `k8s/` → Kubernetes
 - `terraform/`, `.tf` files → IaC
@@ -52,6 +60,7 @@ cat README.md 2>/dev/null | head -50
 ## Step 3: Project Structure Analysis
 
 Present as a tree with annotations:
+
 ```
 project/
 ├── src/              # Source code
@@ -67,6 +76,7 @@ project/
 ## Step 4: Key Patterns Identification
 
 Look for and report:
+
 - **Architecture**: Monolith, Microservices, Serverless, Monorepo
 - **API Style**: REST, GraphQL, gRPC, tRPC
 - **State Management**: Redux, Zustand, MobX, Context
@@ -77,6 +87,7 @@ Look for and report:
 ## Step 5: Development Workflow
 
 Check for:
+
 - `.eslintrc`, `.prettierrc` → Linting/Formatting
 - `.husky/` → Git hooks
 - `Makefile` → Build commands
@@ -90,40 +101,47 @@ Generate a summary using this template:
 # Project: [Name]
 
 ## Overview
+
 [1-2 sentence description]
 
 ## Tech Stack
-| Category | Technology |
-|----------|------------|
-| Language | TypeScript |
+
+| Category  | Technology |
+| --------- | ---------- |
+| Language  | TypeScript |
 | Framework | Next.js 14 |
-| Database | PostgreSQL |
-| ...      | ...        |
+| Database  | PostgreSQL |
+| ...       | ...        |
 
 ## Architecture
+
 [Description with simple ASCII diagram if helpful]
 
 ## Key Directories
+
 - `src/` - [purpose]
 - `lib/` - [purpose]
 
 ## Entry Points
+
 - Main: `src/index.ts`
 - API: `src/api/`
 - Tests: `npm test`
 
 ## Conventions
+
 - [Naming conventions]
 - [File organization patterns]
 - [Code style preferences]
 
 ## Quick Commands
-| Action | Command |
-|--------|---------|
-| Install | `npm install` |
-| Dev | `npm run dev` |
-| Test | `npm test` |
-| Build | `npm run build` |
+
+| Action  | Command         |
+| ------- | --------------- |
+| Install | `npm install`   |
+| Dev     | `npm run dev`   |
+| Test    | `npm test`      |
+| Build   | `npm run build` |
 ```
 
 ## Analysis Validation

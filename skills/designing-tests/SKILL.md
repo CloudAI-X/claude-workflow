@@ -5,6 +5,11 @@ description: Designs and implements testing strategies for any codebase. Use whe
 
 # Designing Tests
 
+### When to Load
+
+- **Trigger**: Adding tests, test strategy planning, improving coverage, setting up testing infrastructure
+- **Skip**: Non-test code changes where testing is not part of the task
+
 ## Test Implementation Workflow
 
 Copy this checklist and track progress:
@@ -39,35 +44,39 @@ Apply the testing pyramid for balanced coverage:
 ## Framework Selection
 
 ### JavaScript/TypeScript
-| Type | Recommended | Alternative |
-|------|-------------|-------------|
-| Unit | Vitest | Jest |
-| Integration | Vitest + MSW | Jest + SuperTest |
-| E2E | Playwright | Cypress |
-| Component | Testing Library | Enzyme |
+
+| Type        | Recommended     | Alternative      |
+| ----------- | --------------- | ---------------- |
+| Unit        | Vitest          | Jest             |
+| Integration | Vitest + MSW    | Jest + SuperTest |
+| E2E         | Playwright      | Cypress          |
+| Component   | Testing Library | Enzyme           |
 
 ### Python
-| Type | Recommended | Alternative |
-|------|-------------|-------------|
-| Unit | pytest | unittest |
-| Integration | pytest + httpx | pytest + requests |
-| E2E | Playwright | Selenium |
-| API | pytest + FastAPI TestClient | - |
+
+| Type        | Recommended                 | Alternative       |
+| ----------- | --------------------------- | ----------------- |
+| Unit        | pytest                      | unittest          |
+| Integration | pytest + httpx              | pytest + requests |
+| E2E         | Playwright                  | Selenium          |
+| API         | pytest + FastAPI TestClient | -                 |
 
 ### Go
-| Type | Recommended |
-|------|-------------|
-| Unit | testing + testify |
+
+| Type        | Recommended        |
+| ----------- | ------------------ |
+| Unit        | testing + testify  |
 | Integration | testing + httptest |
-| E2E | testing + chromedp |
+| E2E         | testing + chromedp |
 
 ## Test Structure Templates
 
 ### Unit Test
+
 ```javascript
-describe('[Unit] ComponentName', () => {
-  describe('methodName', () => {
-    it('should [expected behavior] when [condition]', () => {
+describe("[Unit] ComponentName", () => {
+  describe("methodName", () => {
+    it("should [expected behavior] when [condition]", () => {
       // Arrange
       const input = createTestInput();
 
@@ -78,7 +87,7 @@ describe('[Unit] ComponentName', () => {
       expect(result).toEqual(expectedOutput);
     });
 
-    it('should throw error when [invalid condition]', () => {
+    it("should throw error when [invalid condition]", () => {
       expect(() => methodName(invalidInput)).toThrow(ExpectedError);
     });
   });
@@ -86,8 +95,9 @@ describe('[Unit] ComponentName', () => {
 ```
 
 ### Integration Test
+
 ```javascript
-describe('[Integration] API /users', () => {
+describe("[Integration] API /users", () => {
   beforeAll(async () => {
     await setupTestDatabase();
   });
@@ -96,10 +106,10 @@ describe('[Integration] API /users', () => {
     await teardownTestDatabase();
   });
 
-  it('should create user and return 201', async () => {
+  it("should create user and return 201", async () => {
     const response = await request(app)
-      .post('/users')
-      .send({ name: 'Test', email: 'test@example.com' });
+      .post("/users")
+      .send({ name: "Test", email: "test@example.com" });
 
     expect(response.status).toBe(201);
     expect(response.body.id).toBeDefined();
@@ -108,17 +118,18 @@ describe('[Integration] API /users', () => {
 ```
 
 ### E2E Test
-```javascript
-describe('[E2E] User Registration Flow', () => {
-  it('should complete registration successfully', async ({ page }) => {
-    await page.goto('/register');
 
-    await page.fill('[data-testid="email"]', 'new@example.com');
-    await page.fill('[data-testid="password"]', 'SecurePass123!');
+```javascript
+describe("[E2E] User Registration Flow", () => {
+  it("should complete registration successfully", async ({ page }) => {
+    await page.goto("/register");
+
+    await page.fill('[data-testid="email"]', "new@example.com");
+    await page.fill('[data-testid="password"]', "SecurePass123!");
     await page.click('[data-testid="submit"]');
 
-    await expect(page.locator('.welcome-message')).toBeVisible();
-    await expect(page).toHaveURL('/dashboard');
+    await expect(page.locator(".welcome-message")).toBeVisible();
+    await expect(page).toHaveURL("/dashboard");
   });
 });
 ```
@@ -126,6 +137,7 @@ describe('[E2E] User Registration Flow', () => {
 ## Coverage Strategy
 
 ### What to Cover
+
 - ✅ Business logic (100%)
 - ✅ Edge cases and error handling (90%+)
 - ✅ API contracts (100%)
@@ -135,6 +147,7 @@ describe('[E2E] User Registration Flow', () => {
 - ❌ Simple getters/setters
 
 ### Coverage Thresholds
+
 ```json
 {
   "coverageThreshold": {
@@ -155,6 +168,7 @@ describe('[E2E] User Registration Flow', () => {
 ## Test Data Management
 
 ### Factories/Builders
+
 ```javascript
 // factories/user.js
 export const userFactory = (overrides = {}) => ({
@@ -166,10 +180,11 @@ export const userFactory = (overrides = {}) => ({
 });
 
 // Usage
-const admin = userFactory({ role: 'admin' });
+const admin = userFactory({ role: "admin" });
 ```
 
 ### Fixtures
+
 ```javascript
 // fixtures/users.json
 {
@@ -181,6 +196,7 @@ const admin = userFactory({ role: 'admin' });
 ## Mocking Strategy
 
 ### When to Mock
+
 - ✅ External APIs and services
 - ✅ Database in unit tests
 - ✅ Time/Date for determinism
@@ -189,21 +205,20 @@ const admin = userFactory({ role: 'admin' });
 - ❌ The code under test
 
 ### Mock Examples
+
 ```javascript
 // API mocking with MSW
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse } from "msw";
 
 export const handlers = [
-  http.get('/api/users', () => {
-    return HttpResponse.json([
-      { id: 1, name: 'John' },
-    ]);
+  http.get("/api/users", () => {
+    return HttpResponse.json([{ id: 1, name: "John" }]);
   }),
 ];
 
 // Time mocking
 vi.useFakeTimers();
-vi.setSystemTime(new Date('2024-01-01'));
+vi.setSystemTime(new Date("2024-01-01"));
 ```
 
 ## Test Validation Loop

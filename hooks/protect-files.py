@@ -9,28 +9,35 @@ import os
 import fnmatch
 
 # Files/patterns to protect (exit code 2 = block)
-PROTECTED_PATTERNS = [
+# Each entry is (pattern, reason) for actionable messages
+PROTECTED_PATTERNS_WITH_REASONS = [
     # Lock files (usually shouldn't be manually edited)
-    'package-lock.json',
-    'yarn.lock',
-    'pnpm-lock.yaml',
-    'Gemfile.lock',
-    'poetry.lock',
-    'Cargo.lock',
-    
+    ('package-lock.json', "Lock files should be updated via package manager (npm install), not edited directly"),
+    ('yarn.lock', "Lock files should be updated via package manager (yarn install), not edited directly"),
+    ('pnpm-lock.yaml', "Lock files should be updated via package manager (pnpm install), not edited directly"),
+    ('Gemfile.lock', "Lock files should be updated via package manager (bundle install), not edited directly"),
+    ('poetry.lock', "Lock files should be updated via package manager (poetry lock), not edited directly"),
+    ('Cargo.lock', "Lock files should be updated via package manager (cargo update), not edited directly"),
+
     # Sensitive files
-    '.env',
-    '.env.local',
-    '.env.production',
-    '**/secrets/*',
-    '**/credentials/*',
-    
+    ('.env', ".env files contain secrets — edit manually outside of Claude Code"),
+    ('.env.local', ".env files contain secrets — edit manually outside of Claude Code"),
+    ('.env.production', ".env files contain secrets — edit manually outside of Claude Code"),
+    ('**/secrets/*', "Secrets directory contains sensitive data — manage outside of Claude Code"),
+    ('**/credentials/*', "Credentials directory contains sensitive data — manage outside of Claude Code"),
+
     # Git internals
-    '.git/*',
-    
+    ('.git/*', ".git directory is managed by Git — never edit directly"),
+
     # CI/CD (warn but don't block)
     # '.github/workflows/*',
 ]
+
+# Flat list for backward-compatible matching
+PROTECTED_PATTERNS = [p for p, _ in PROTECTED_PATTERNS_WITH_REASONS]
+
+# Map pattern to reason for lookup
+PROTECTED_REASONS = {p: r for p, r in PROTECTED_PATTERNS_WITH_REASONS}
 
 # Files that should warn but not block
 WARN_PATTERNS = [
@@ -61,8 +68,10 @@ def main():
         # Check for blocked patterns
         blocked = matches_pattern(file_path, PROTECTED_PATTERNS)
         if blocked:
-            print(f"🚫 BLOCKED: {file_path}")
+            reason = PROTECTED_REASONS.get(blocked, "This file is protected from edits")
+            print(f"BLOCKED: {file_path}")
             print(f"   Matches protected pattern: {blocked}")
+            print(f"   Reason: {reason}")
             print("   Use --force if this is intentional")
             sys.exit(2)  # Block the operation
         

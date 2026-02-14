@@ -27,7 +27,9 @@ function isValidRepoFormat(repo) {
 async function install(repo, name) {
   // HIGH-1 FIX: Validate repository format to prevent path traversal
   if (!isValidRepoFormat(repo)) {
-    throw new Error(`Invalid repository format: "${repo}". Expected: owner/repo`);
+    throw new Error(
+      `Invalid repository format: "${repo}". Expected: owner/repo`,
+    );
   }
 
   const cwd = process.cwd();
@@ -57,7 +59,10 @@ async function install(repo, name) {
   let timeoutId;
   try {
     const timeoutPromise = new Promise((_, reject) => {
-      timeoutId = setTimeout(() => reject(new Error("Download timed out after 60 seconds")), TIMEOUT_MS);
+      timeoutId = setTimeout(
+        () => reject(new Error("Download timed out after 60 seconds")),
+        TIMEOUT_MS,
+      );
     });
     await Promise.race([emitter.clone(tempTarget), timeoutPromise]);
     clearTimeout(timeoutId);
@@ -71,13 +76,13 @@ async function install(repo, name) {
     if (err.code === "ENOTFOUND" || err.message.includes("getaddrinfo")) {
       throw new Error(
         `Network error accessing github.com/${repo}\n` +
-          `   Check: internet connection, firewall, proxy settings`
+          `   Check: internet connection, firewall, proxy settings`,
       );
     }
     if (err.message.includes("could not find commit")) {
       throw new Error(
         `Repository not found: github.com/${repo}\n` +
-          `   Verify the repository exists and is public`
+          `   Verify the repository exists and is public`,
       );
     }
     throw new Error(`Download failed for ${repo}: ${err.message}`);
@@ -109,12 +114,14 @@ async function install(repo, name) {
     agents: countFiles(path.join(target, "agents"), ".md"),
     skills: countDirs(path.join(target, "skills")),
     commands: countFiles(path.join(target, "commands"), ".md"),
-    hooks: countFiles(path.join(target, "hooks"), ".py"),
+    hooks:
+      countFiles(path.join(target, "hooks"), ".py") +
+      countFiles(path.join(target, "hooks"), ".sh"),
   };
 
   console.log(`\n✅ Installed to .claude/\n`);
   console.log(
-    `   ${components.agents} agents | ${components.skills} skills | ${components.commands} commands | ${components.hooks} hooks`
+    `   ${components.agents} agents | ${components.skills} skills | ${components.commands} commands | ${components.hooks} hooks`,
   );
   if (stats.skipped > 0) {
     console.log(`   (${stats.skipped} existing files preserved)`);
@@ -141,9 +148,14 @@ function mergeDirectories(src, dest, stats) {
         const resolvedDest = path.resolve(dest);
 
         // Only allow symlinks that point inside the .claude directory
-        if (!resolvedTarget.startsWith(resolvedDest + path.sep) && resolvedTarget !== resolvedDest) {
+        if (
+          !resolvedTarget.startsWith(resolvedDest + path.sep) &&
+          resolvedTarget !== resolvedDest
+        ) {
           // Unsafe symlink - skip it with warning
-          console.warn(`   ⚠️  Skipping unsafe symlink: ${entry.name} -> ${linkTarget}`);
+          console.warn(
+            `   ⚠️  Skipping unsafe symlink: ${entry.name} -> ${linkTarget}`,
+          );
           stats.skipped++;
           continue;
         }

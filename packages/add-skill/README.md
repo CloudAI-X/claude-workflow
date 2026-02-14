@@ -9,6 +9,7 @@ npm exec install-claude-workflow-v2@latest
 ```
 
 Or with npx:
+
 ```bash
 npx --yes install-claude-workflow-v2@latest
 ```
@@ -20,9 +21,9 @@ That's it. Run `claude` to start.
 ```
 .claude/
 ├── agents/      # 7 specialized subagents
-├── skills/      # 10 knowledge domains
-├── commands/    # 17 slash commands
-└── hooks/       # 9 automation scripts
+├── skills/      # 14 knowledge domains
+├── commands/    # 26 slash commands
+└── hooks/       # 14 automation scripts
 ```
 
 ## Features
@@ -38,7 +39,7 @@ That's it. Run `claude` to start.
 
 ## Repository
 
-https://github.com/CloudAI-X/claude-workflow
+https://github.com/CloudAI-X/claude-workflow-v2
 
 ## License
 

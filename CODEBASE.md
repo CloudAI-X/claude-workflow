@@ -9,22 +9,22 @@
 
 **project-starter** (formerly claude-workflow) is a universal Claude Code plugin that augments the IDE with specialized AI agents, knowledge skills, automation hooks, and workflow commands for accelerated software development.
 
-| Attribute        | Value                                        |
-| ---------------- | -------------------------------------------- |
-| **Name**         | project-starter                              |
-| **Version**      | 1.1.0                                        |
-| **Type**         | Claude Code Plugin                           |
-| **License**      | MIT                                          |
-| **Author**       | CloudAI-X                                    |
-| **Repository**   | https://github.com/CloudAI-X/claude-workflow |
-| **Requirements** | Claude Code v1.0.33+, Python 3, Git          |
+| Attribute        | Value                                           |
+| ---------------- | ----------------------------------------------- |
+| **Name**         | project-starter                                 |
+| **Version**      | 1.2.0                                           |
+| **Type**         | Claude Code Plugin                              |
+| **License**      | MIT                                             |
+| **Author**       | CloudAI-X                                       |
+| **Repository**   | https://github.com/CloudAI-X/claude-workflow-v2 |
+| **Requirements** | Claude Code v1.0.33+, Python 3, Git             |
 
 ### Key Capabilities
 
-- **7 Specialized Agents**: Autonomous subagents for code review, debugging, security, testing, refactoring, documentation, and orchestration
-- **19 Slash Commands**: Output styles, git workflows, verification pipelines
-- **7 Knowledge Skills**: Architecture, testing, APIs, performance, git, project analysis, parallel execution
-- **9+ Automation Hooks**: Pre/post tool validation, formatting, security scanning, notifications
+- **7 Specialized Agents**: Autonomous subagents with action-first directives, effort scaling, and adversarial self-review
+- **26 Slash Commands**: Output styles, git workflows, verification, planning, onboarding, metrics
+- **14 Knowledge Skills**: Architecture, testing, APIs, performance, git, security, database, devops, error handling — with on-demand context loading
+- **14 Automation Hooks**: Pre/post tool validation, formatting, security, TypeScript, branch protection, doc suggestions, metrics, notifications
 
 ---
 
@@ -35,7 +35,9 @@ claude-workflow/
 ├── .claude-plugin/              # Plugin configuration
 │   ├── plugin.json              # Plugin manifest (name, version, metadata)
 │   └── marketplace.json         # Marketplace publishing metadata
-├── .github/                     # GitHub governance
+├── .github/                     # GitHub governance & CI
+│   ├── workflows/
+│   │   └── validate.yml         # Plugin validation CI/CD
 │   ├── PULL_REQUEST_TEMPLATE.md
 │   └── ISSUE_TEMPLATE/
 │       ├── bug_report.md
@@ -50,7 +52,7 @@ claude-workflow/
 │   ├── security-auditor.md      # OWASP vulnerability detection
 │   ├── refactorer.md            # Code structure improvements
 │   └── test-architect.md        # Test strategy design
-├── commands/                    # 19 slash commands
+├── commands/                    # 26 slash commands
 │   ├── architect.md             # System design mode
 │   ├── rapid.md                 # Fast development mode
 │   ├── mentor.md                # Teaching mode
@@ -69,27 +71,45 @@ claude-workflow/
 │   ├── summarize-changes.md     # Session summaries
 │   ├── code-simplifier.md       # Post-implementation cleanup
 │   ├── parallel-review.md       # Multi-directory review
-│   └── parallel-analyze.md      # Multi-perspective analysis
-├── skills/                      # 7 knowledge domains
+│   ├── parallel-analyze.md      # Multi-perspective analysis
+│   ├── plan.md                  # Persistent PLAN.md tracking
+│   ├── refactor-guided.md       # 4-phase guided refactoring
+│   ├── dependency-upgrade.md    # Safe dependency upgrades
+│   ├── tutorial.md              # Interactive plugin tutorial
+│   ├── bootstrap-repo.md        # 10-agent repo exploration
+│   ├── save-session-learnings.md # Persist session discoveries
+│   └── metrics.md               # View agent metrics
+├── skills/                      # 14 knowledge domains
 │   ├── analyzing-projects/SKILL.md
+│   ├── convex-backend/SKILL.md
+│   ├── database-design/SKILL.md
 │   ├── designing-architecture/SKILL.md
 │   ├── designing-apis/SKILL.md
 │   ├── designing-tests/SKILL.md
+│   ├── devops-infrastructure/SKILL.md
+│   ├── error-handling/SKILL.md
 │   ├── managing-git/SKILL.md
 │   ├── optimizing-performance/SKILL.md
-│   └── parallel-execution/SKILL.md
-├── hooks/                       # Automation scripts
+│   ├── parallel-execution/SKILL.md
+│   ├── security-patterns/SKILL.md
+│   ├── vercel-react-best-practices/SKILL.md
+│   └── web-design-guidelines/SKILL.md
+├── hooks/                       # 14 automation scripts
 │   ├── hooks.json               # Hook registry
-│   └── scripts/
-│       ├── protect-files.py     # Block sensitive file edits
-│       ├── security-check.py    # Detect hardcoded secrets
-│       ├── format-on-edit.py    # Auto-format (prettier/black/gofmt)
-│       ├── validate-environment.py  # Check Node/Python/Git
-│       ├── validate-prompt.py   # Suggest agents for prompts
-│       ├── verify-on-complete.py    # Run tests/lint on completion
-│       ├── log-commands.sh      # Audit bash commands
-│       ├── notify-input.sh      # Desktop notification (input needed)
-│       └── notify-complete.sh   # Desktop notification (complete)
+│   ├── protect-files.py         # Block sensitive file edits
+│   ├── security-check.py        # Detect hardcoded secrets
+│   ├── format-on-edit.py        # Auto-format (prettier/black/gofmt)
+│   ├── typescript-check.py      # tsc --noEmit on .ts/.tsx edits
+│   ├── pre-commit-check.py      # Debug statements & temp markers
+│   ├── validate-environment.py  # Check Node/Python/Git
+│   ├── validate-prompt.py       # Suggest agents for prompts
+│   ├── verify-on-complete.py    # Run tests/lint on completion
+│   ├── log-commands.sh          # Audit bash commands
+│   ├── branch-protection.sh     # Warn on protected branch ops
+│   ├── suggest-doc-updates.py   # Suggest doc updates on changes
+│   ├── track-metrics.py         # Session telemetry logging
+│   ├── notify-input.sh          # Desktop notification (input needed)
+│   └── notify-complete.sh       # Desktop notification (complete)
 ├── examples/                    # Multi-agent orchestration examples
 │   ├── README.md
 │   └── orchestration/
@@ -118,7 +138,7 @@ claude-workflow/
 **1. Per-Session (Temporary)**
 
 ```bash
-git clone https://github.com/CloudAI-X/claude-workflow.git
+git clone https://github.com/CloudAI-X/claude-workflow-v2.git
 claude --plugin-dir ./claude-workflow
 ```
 
@@ -196,15 +216,15 @@ This plugin uses a **metadata-driven, modular architecture** with no traditional
 
 ### Agent Hierarchy
 
-| Agent                | Model  | Responsibility                              | Auto-Trigger Keywords               |
-| -------------------- | ------ | ------------------------------------------- | ----------------------------------- |
-| **orchestrator**     | opus   | Multi-step coordination, parallel execution | "improve", "refactor", multi-module |
-| **code-reviewer**    | sonnet | Quality assessment, best practices          | "review", "check", code changes     |
-| **debugger**         | sonnet | Root cause analysis, bug fixing             | "bug", "error", "crash", "fail"     |
-| **security-auditor** | sonnet | Vulnerability detection, OWASP              | "security", "auth", "vulnerable"    |
-| **test-architect**   | sonnet | Test strategy, coverage                     | "test", "coverage", "spec"          |
-| **refactorer**       | sonnet | Code structure, SOLID principles            | "refactor", "clean", "simplify"     |
-| **docs-writer**      | sonnet | Technical documentation                     | "document", "readme", "api docs"    |
+| Agent                | Model  | Responsibility                              | Auto-Trigger Keywords                                |
+| -------------------- | ------ | ------------------------------------------- | ---------------------------------------------------- |
+| **orchestrator**     | opus   | Multi-step coordination, parallel execution | "improve", "enhance", "build", "architecture"        |
+| **code-reviewer**    | sonnet | Quality assessment, best practices          | "review", "PR review", "lint", "standards audit"     |
+| **debugger**         | sonnet | Root cause analysis, bug fixing             | "bug", "error", "crash", "memory leak", "timeout"    |
+| **security-auditor** | sonnet | Vulnerability detection, OWASP              | "security", "auth", "JWT", "CORS", "secrets"         |
+| **test-architect**   | sonnet | Test strategy, coverage                     | "test", "coverage", "mocking", "flaky tests"         |
+| **refactorer**       | sonnet | Code structure, SOLID principles            | "refactor", "tech debt", "code smells", "complexity" |
+| **docs-writer**      | sonnet | Technical documentation                     | "document", "changelog", "migration guide"           |
 
 ### Parallel Execution (v1.1.0)
 
@@ -343,7 +363,7 @@ verify-changes command spawns 5 parallel subagents:
 
 ## API Reference
 
-### Commands (19 total)
+### Commands (26 total)
 
 #### Output Styles
 
@@ -379,16 +399,34 @@ verify-changes command spawns 5 parallel subagents:
 | `/project-starter:parallel-review`  | Multi-directory parallel review      |
 | `/project-starter:parallel-analyze` | Multi-perspective analysis           |
 
+#### Planning & Refactoring
+
+| Command                               | Description                       |
+| ------------------------------------- | --------------------------------- |
+| `/project-starter:plan`               | Persistent PLAN.md phase tracking |
+| `/project-starter:refactor-guided`    | 4-phase systematic refactoring    |
+| `/project-starter:dependency-upgrade` | Safe dependency upgrades          |
+
+#### Onboarding & Knowledge
+
+| Command                                   | Description                        |
+| ----------------------------------------- | ---------------------------------- |
+| `/project-starter:tutorial`               | Interactive guided tutorial        |
+| `/project-starter:bootstrap-repo`         | 10-agent parallel repo exploration |
+| `/project-starter:save-session-learnings` | Persist session discoveries        |
+| `/project-starter:metrics`                | View agent performance metrics     |
+
 ### Hook Events
 
-| Event                | Trigger                | Scripts                                                    |
-| -------------------- | ---------------------- | ---------------------------------------------------------- |
-| **PreToolUse**       | Before Edit/Write/Bash | `protect-files.py`, `security-check.py`, `log-commands.sh` |
-| **PostToolUse**      | After Edit/Write       | `format-on-edit.py`                                        |
-| **SessionStart**     | Plugin load            | `validate-environment.py`                                  |
-| **UserPromptSubmit** | User prompt            | `validate-prompt.py`                                       |
-| **Stop**             | Task complete          | `verify-on-complete.py`, `notify-complete.sh`              |
-| **Notification**     | Input needed           | `notify-input.sh`                                          |
+| Event                | Trigger           | Scripts                                                                                     |
+| -------------------- | ----------------- | ------------------------------------------------------------------------------------------- |
+| **PreToolUse**       | Before Edit/Write | `protect-files.py`, `security-check.py`                                                     |
+| **PreToolUse**       | Before Bash       | `log-commands.sh`, `branch-protection.sh`, `pre-commit-check.py`                            |
+| **PostToolUse**      | After Edit/Write  | `format-on-edit.py`, `typescript-check.py`                                                  |
+| **SessionStart**     | Plugin load       | `validate-environment.py`                                                                   |
+| **UserPromptSubmit** | User prompt       | `validate-prompt.py`                                                                        |
+| **Stop**             | Task complete     | `verify-on-complete.py`, `suggest-doc-updates.py`, `notify-complete.sh`, `track-metrics.py` |
+| **Notification**     | Input needed      | `notify-input.sh`                                                                           |
 
 ---
 
@@ -564,19 +602,37 @@ All tools are optional. Missing tools result in warnings, not failures.
 
 ### Skill Documentation
 
-| Skill                  | File                                                                             |
-| ---------------------- | -------------------------------------------------------------------------------- |
-| Analyzing Projects     | [skills/analyzing-projects/SKILL.md](skills/analyzing-projects/SKILL.md)         |
-| Designing Architecture | [skills/designing-architecture/SKILL.md](skills/designing-architecture/SKILL.md) |
-| Designing APIs         | [skills/designing-apis/SKILL.md](skills/designing-apis/SKILL.md)                 |
-| Designing Tests        | [skills/designing-tests/SKILL.md](skills/designing-tests/SKILL.md)               |
-| Managing Git           | [skills/managing-git/SKILL.md](skills/managing-git/SKILL.md)                     |
-| Optimizing Performance | [skills/optimizing-performance/SKILL.md](skills/optimizing-performance/SKILL.md) |
-| Parallel Execution     | [skills/parallel-execution/SKILL.md](skills/parallel-execution/SKILL.md)         |
+| Skill                       | File                                                                                       |
+| --------------------------- | ------------------------------------------------------------------------------------------ |
+| Analyzing Projects          | [skills/analyzing-projects/SKILL.md](skills/analyzing-projects/SKILL.md)                   |
+| Convex Backend              | [skills/convex-backend/SKILL.md](skills/convex-backend/SKILL.md)                           |
+| Database Design             | [skills/database-design/SKILL.md](skills/database-design/SKILL.md)                         |
+| Designing Architecture      | [skills/designing-architecture/SKILL.md](skills/designing-architecture/SKILL.md)           |
+| Designing APIs              | [skills/designing-apis/SKILL.md](skills/designing-apis/SKILL.md)                           |
+| Designing Tests             | [skills/designing-tests/SKILL.md](skills/designing-tests/SKILL.md)                         |
+| DevOps Infrastructure       | [skills/devops-infrastructure/SKILL.md](skills/devops-infrastructure/SKILL.md)             |
+| Error Handling              | [skills/error-handling/SKILL.md](skills/error-handling/SKILL.md)                           |
+| Managing Git                | [skills/managing-git/SKILL.md](skills/managing-git/SKILL.md)                               |
+| Optimizing Performance      | [skills/optimizing-performance/SKILL.md](skills/optimizing-performance/SKILL.md)           |
+| Parallel Execution          | [skills/parallel-execution/SKILL.md](skills/parallel-execution/SKILL.md)                   |
+| Security Patterns           | [skills/security-patterns/SKILL.md](skills/security-patterns/SKILL.md)                     |
+| Vercel React Best Practices | [skills/vercel-react-best-practices/SKILL.md](skills/vercel-react-best-practices/SKILL.md) |
+| Web Design Guidelines       | [skills/web-design-guidelines/SKILL.md](skills/web-design-guidelines/SKILL.md)             |
 
 ---
 
 ## Version History
+
+### v1.2.0 (2026-02-14)
+
+- **Agent Upgrades**: All 7 agents enhanced with action-first directives, effort scaling, adversarial self-review, paired WRONG/CORRECT examples
+- **4 New Skills**: `database-design`, `devops-infrastructure`, `error-handling`, `security-patterns`
+- **On-Demand Context Loading**: All 14 skills now have "When to Load" sections for optimized context usage
+- **7 New Commands**: `plan`, `refactor-guided`, `dependency-upgrade`, `tutorial`, `bootstrap-repo`, `save-session-learnings`, `metrics`
+- **5 New Hooks**: `pre-commit-check.py`, `branch-protection.sh`, `typescript-check.py`, `suggest-doc-updates.py`, `track-metrics.py`
+- **Improved Hook Messages**: All hooks now include actionable remediation suggestions
+- **CI/CD**: GitHub Actions plugin validation workflow
+- **Rewritten**: `web-design-guidelines` skill now self-contained (was external URL dependency)
 
 ### v1.1.0 (2025-01-07)
 

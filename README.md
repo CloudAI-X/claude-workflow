@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-v1.0.33+-blue.svg)](https://code.claude.com)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/CloudAI-X/claude-workflow/pulls)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/CloudAI-X/claude-workflow-v2/pulls)
 
 A universal Claude Code workflow plugin with specialized agents, skills, hooks, and output styles for any software project.
 
@@ -14,7 +14,7 @@ A universal Claude Code workflow plugin with specialized agents, skills, hooks, 
 
 ```bash
 # Clone the plugin
-git clone https://github.com/CloudAI-X/claude-workflow.git
+git clone https://github.com/CloudAI-X/claude-workflow-v2.git
 
 # Run Claude Code with the plugin
 claude --plugin-dir ./claude-workflow
@@ -69,12 +69,12 @@ These commands become available:
 
 ## What's Included
 
-| Component    | Count | Description                                                              |
-| ------------ | ----- | ------------------------------------------------------------------------ |
-| **Agents**   | 7     | Specialized subagents for code review, debugging, security, etc.         |
-| **Commands** | 17    | Slash commands for workflows and output styles                           |
-| **Skills**   | 10    | Knowledge domains Claude uses autonomously                               |
-| **Hooks**    | 9     | Automation scripts for formatting, security, verification, notifications |
+| Component    | Count | Description                                                             |
+| ------------ | ----- | ----------------------------------------------------------------------- |
+| **Agents**   | 7     | Specialized subagents for code review, debugging, security, etc.        |
+| **Commands** | 26    | Slash commands for workflows, output styles, planning, and onboarding   |
+| **Skills**   | 14    | Knowledge domains with on-demand context loading                        |
+| **Hooks**    | 14    | Automation scripts for formatting, security, metrics, and notifications |
 
 ---
 
@@ -238,21 +238,38 @@ All commands use the format `/project-starter:<command>`.
 | `/project-starter:security-scan`   | Security vulnerability detection        |
 | `/project-starter:code-simplifier` | Post-implementation cleanup             |
 
+### Planning & Refactoring
+
+| Command                               | Purpose                                    |
+| ------------------------------------- | ------------------------------------------ |
+| `/project-starter:plan`               | Persistent PLAN.md with phase tracking     |
+| `/project-starter:refactor-guided`    | 4-phase systematic refactoring with safety |
+| `/project-starter:dependency-upgrade` | Safe dependency upgrades with rollback     |
+
+### Onboarding & Knowledge
+
+| Command                                   | Purpose                                   |
+| ----------------------------------------- | ----------------------------------------- |
+| `/project-starter:tutorial`               | Interactive guided tutorial for new users |
+| `/project-starter:bootstrap-repo`         | 10-agent parallel repo exploration        |
+| `/project-starter:save-session-learnings` | Persist session discoveries to docs       |
+| `/project-starter:metrics`                | View agent performance metrics            |
+
 ---
 
 ## Agents
 
 Agents are specialized subagents that Claude spawns automatically based on your task.
 
-| Agent              | Purpose                          | Auto-Triggers                               |
-| ------------------ | -------------------------------- | ------------------------------------------- |
-| `orchestrator`     | Coordinate multi-step tasks      | "improve", "refactor", multi-module changes |
-| `code-reviewer`    | Review code quality              | After code changes, before commits          |
-| `debugger`         | Systematic bug investigation     | Errors, test failures, crashes              |
-| `docs-writer`      | Technical documentation          | README, API docs, guides                    |
-| `security-auditor` | Security vulnerability detection | Auth, user input, sensitive data            |
-| `refactorer`       | Code structure improvements      | Technical debt, cleanup                     |
-| `test-architect`   | Design test strategies           | Adding/improving tests                      |
+| Agent              | Purpose                          | Auto-Triggers                                                |
+| ------------------ | -------------------------------- | ------------------------------------------------------------ |
+| `orchestrator`     | Coordinate multi-step tasks      | "improve", "enhance", "build", "architecture", complex tasks |
+| `code-reviewer`    | Review code quality              | "review", "PR review", "lint", code changes                  |
+| `debugger`         | Systematic bug investigation     | Errors, crashes, memory leaks, timeouts, race conditions     |
+| `docs-writer`      | Technical documentation          | README, changelogs, migration guides, release notes          |
+| `security-auditor` | Security vulnerability detection | Auth, encryption, secrets, OAuth, JWT, CORS                  |
+| `refactorer`       | Code structure improvements      | Tech debt, code smells, complexity reduction                 |
+| `test-architect`   | Design test strategies           | Test plans, mocking, flaky tests, integration/E2E            |
 
 ---
 
@@ -269,9 +286,13 @@ Skills are knowledge domains that Claude uses autonomously when relevant.
 | `managing-git`                | Version control, conventional commits                 |
 | `designing-apis`              | REST/GraphQL patterns and best practices              |
 | `parallel-execution`          | Multi-subagent parallel task execution patterns       |
-| `web-design-guidelines`       | UI review against Vercel Web Interface Guidelines     |
+| `web-design-guidelines`       | Self-contained UI audit (A11Y, PERF, RD, SEC, I18N)   |
 | `vercel-react-best-practices` | React/Next.js performance optimization (45 rules)     |
 | `convex-backend`              | Convex backend development (functions, schemas, etc.) |
+| `database-design`             | Schema design, indexing, query optimization           |
+| `devops-infrastructure`       | Docker, CI/CD, deployment, IaC, monitoring            |
+| `error-handling`              | Error patterns, structured logging, retry/circuit     |
+| `security-patterns`           | Auth, RBAC, secrets, CORS, rate limiting, headers     |
 
 ---
 
@@ -279,17 +300,22 @@ Skills are knowledge domains that Claude uses autonomously when relevant.
 
 Hooks run automatically on specific events.
 
-| Hook                  | Trigger       | Action                                 |
-| --------------------- | ------------- | -------------------------------------- |
-| Security scan         | Edit/Write    | Blocks commits with potential secrets  |
-| File protection       | Edit/Write    | Blocks edits to lock files, .env, .git |
-| Auto-format           | Edit/Write    | Runs prettier/black/gofmt by file type |
-| Command logging       | Bash          | Logs to `.claude/command-history.log`  |
-| Environment check     | Session start | Validates Node.js, Python, Git         |
-| Prompt analysis       | User prompt   | Suggests appropriate agents            |
-| Auto-verify           | Task complete | Runs tests/lint, reports results       |
-| Input notification    | Input needed  | Desktop notification                   |
-| Complete notification | Task complete | Desktop notification                   |
+| Hook                  | Trigger       | Action                                  |
+| --------------------- | ------------- | --------------------------------------- |
+| Security scan         | Edit/Write    | Blocks commits with potential secrets   |
+| File protection       | Edit/Write    | Blocks edits to lock files, .env, .git  |
+| Auto-format           | Edit/Write    | Runs prettier/black/gofmt by file type  |
+| TypeScript check      | Edit/Write    | Runs `tsc --noEmit` on .ts/.tsx files   |
+| Pre-commit check      | Bash          | Detects debug statements & temp markers |
+| Branch protection     | Bash          | Warns on commits to protected branches  |
+| Command logging       | Bash          | Logs to `.claude/command-history.log`   |
+| Environment check     | Session start | Validates Node.js, Python, Git          |
+| Prompt analysis       | User prompt   | Suggests appropriate agents             |
+| Auto-verify           | Task complete | Runs tests/lint, reports results        |
+| Doc update suggest    | Task complete | Suggests CLAUDE.md updates for changes  |
+| Session metrics       | Task complete | Logs session telemetry to metrics file  |
+| Input notification    | Input needed  | Desktop notification                    |
+| Complete notification | Task complete | Desktop notification                    |
 
 ---
 
@@ -438,7 +464,7 @@ claude-workflow/
 │   ├── security-auditor.md
 │   ├── refactorer.md
 │   └── test-architect.md
-├── commands/                 # 17 slash commands
+├── commands/                 # 26 slash commands
 │   ├── architect.md          # Output styles
 │   ├── rapid.md
 │   ├── mentor.md
@@ -455,21 +481,34 @@ claude-workflow/
 │   ├── run-tests.md
 │   ├── lint-check.md
 │   ├── security-scan.md
-│   └── code-simplifier.md
-├── skills/                   # 10 knowledge domains
+│   ├── code-simplifier.md
+│   ├── parallel-review.md    # Parallel
+│   ├── parallel-analyze.md
+│   ├── plan.md               # Planning & refactoring
+│   ├── refactor-guided.md
+│   ├── dependency-upgrade.md
+│   ├── tutorial.md           # Onboarding & knowledge
+│   ├── bootstrap-repo.md
+│   ├── save-session-learnings.md
+│   └── metrics.md
+├── skills/                   # 14 knowledge domains
 │   ├── analyzing-projects/
 │   ├── convex-backend/
+│   ├── database-design/
 │   ├── designing-apis/
 │   ├── designing-architecture/
 │   ├── designing-tests/
+│   ├── devops-infrastructure/
+│   ├── error-handling/
 │   ├── managing-git/
 │   ├── optimizing-performance/
 │   ├── parallel-execution/
+│   ├── security-patterns/
 │   ├── vercel-react-best-practices/
 │   └── web-design-guidelines/
 ├── hooks/
 │   ├── hooks.json            # Hook configuration
-│   └── scripts/              # 9 automation scripts
+│   └── 14 automation scripts # Pre/post tool, session, metrics, notifications
 ├── templates/                # User-copyable templates
 │   ├── CLAUDE.md.template
 │   ├── settings.json.template

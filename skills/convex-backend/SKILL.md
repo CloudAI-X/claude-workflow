@@ -5,6 +5,11 @@ description: Convex backend development guidelines. Use when writing Convex func
 
 # Convex Backend Guidelines
 
+### When to Load
+
+- **Trigger**: Convex-specific development, writing Convex functions, schemas, queries, mutations, actions, or real-time subscriptions
+- **Skip**: Project does not use Convex as its backend
+
 Comprehensive guide for building Convex backends with TypeScript. Covers function syntax, validators, schemas, queries, mutations, actions, scheduling, and file storage.
 
 ## When to Apply

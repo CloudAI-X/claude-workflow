@@ -5,6 +5,11 @@ description: Analyzes and optimizes application performance across frontend, bac
 
 # Optimizing Performance
 
+### When to Load
+
+- **Trigger**: Diagnosing slowness, profiling, caching strategies, reducing load times, bundle size optimization
+- **Skip**: Correctness-focused work where performance is not a concern
+
 ## Performance Optimization Workflow
 
 Copy this checklist and track progress:
@@ -23,6 +28,7 @@ Performance Optimization Progress:
 ## Step 1: Measure Baseline
 
 ### Profiling Commands
+
 ```bash
 # Node.js profiling
 node --prof app.js
@@ -39,30 +45,33 @@ lighthouse https://example.com --output=json
 ## Step 2: Identify Bottlenecks
 
 ### Common Bottleneck Categories
-| Category | Symptoms | Tools |
-|----------|----------|-------|
-| CPU | High CPU usage, slow computation | Profiler, flame graphs |
-| Memory | High RAM, GC pauses, OOM | Heap snapshots, memory profiler |
-| I/O | Slow disk/network, waiting | strace, network inspector |
-| Database | Slow queries, lock contention | Query analyzer, EXPLAIN |
+
+| Category | Symptoms                         | Tools                           |
+| -------- | -------------------------------- | ------------------------------- |
+| CPU      | High CPU usage, slow computation | Profiler, flame graphs          |
+| Memory   | High RAM, GC pauses, OOM         | Heap snapshots, memory profiler |
+| I/O      | Slow disk/network, waiting       | strace, network inspector       |
+| Database | Slow queries, lock contention    | Query analyzer, EXPLAIN         |
 
 ## Step 3: Apply Optimizations
 
 ### Frontend Optimizations
 
 **Bundle Size:**
+
 ```javascript
 // ❌ Import entire library
-import _ from 'lodash';
+import _ from "lodash";
 
 // ✅ Import only needed functions
-import debounce from 'lodash/debounce';
+import debounce from "lodash/debounce";
 
 // ✅ Use dynamic imports for code splitting
-const HeavyComponent = lazy(() => import('./HeavyComponent'));
+const HeavyComponent = lazy(() => import("./HeavyComponent"));
 ```
 
 **Rendering:**
+
 ```javascript
 // ❌ Render on every parent update
 function Child({ data }) {
@@ -79,6 +88,7 @@ const processed = useMemo(() => expensiveCalc(data), [data]);
 ```
 
 **Images:**
+
 ```html
 <!-- ❌ Unoptimized -->
 <img src="large-image.jpg" />
@@ -96,6 +106,7 @@ const processed = useMemo(() => expensiveCalc(data), [data]);
 ### Backend Optimizations
 
 **Database Queries:**
+
 ```sql
 -- ❌ N+1 Query Problem
 SELECT * FROM users;
@@ -112,6 +123,7 @@ SELECT * FROM users LIMIT 100 OFFSET 0;
 ```
 
 **Caching Strategy:**
+
 ```javascript
 // Multi-layer caching
 const getUser = async (id) => {
@@ -136,17 +148,18 @@ const getUser = async (id) => {
 ```
 
 **Async Processing:**
+
 ```javascript
 // ❌ Blocking operation
-app.post('/upload', async (req, res) => {
-  await processVideo(req.file);  // Takes 5 minutes
-  res.send('Done');
+app.post("/upload", async (req, res) => {
+  await processVideo(req.file); // Takes 5 minutes
+  res.send("Done");
 });
 
 // ✅ Queue for background processing
-app.post('/upload', async (req, res) => {
-  const jobId = await queue.add('processVideo', { file: req.file });
-  res.send({ jobId, status: 'processing' });
+app.post("/upload", async (req, res) => {
+  const jobId = await queue.add("processVideo", { file: req.file });
+  res.send({ jobId, status: "processing" });
 });
 ```
 
@@ -191,20 +204,22 @@ Comparison Checklist:
 ## Performance Targets
 
 ### Web Vitals
-| Metric | Good | Needs Work | Poor |
-|--------|------|------------|------|
-| LCP | < 2.5s | 2.5-4s | > 4s |
-| FID | < 100ms | 100-300ms | > 300ms |
-| CLS | < 0.1 | 0.1-0.25 | > 0.25 |
-| TTFB | < 800ms | 800ms-1.8s | > 1.8s |
+
+| Metric | Good    | Needs Work | Poor    |
+| ------ | ------- | ---------- | ------- |
+| LCP    | < 2.5s  | 2.5-4s     | > 4s    |
+| FID    | < 100ms | 100-300ms  | > 300ms |
+| CLS    | < 0.1   | 0.1-0.25   | > 0.25  |
+| TTFB   | < 800ms | 800ms-1.8s | > 1.8s  |
 
 ### API Performance
-| Metric | Target |
-|--------|--------|
+
+| Metric      | Target  |
+| ----------- | ------- |
 | P50 Latency | < 100ms |
 | P95 Latency | < 500ms |
-| P99 Latency | < 1s |
-| Error Rate | < 0.1% |
+| P99 Latency | < 1s    |
+| Error Rate  | < 0.1%  |
 
 ## Validation
 

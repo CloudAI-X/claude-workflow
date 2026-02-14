@@ -5,6 +5,11 @@ description: Designs software architecture and selects appropriate patterns for 
 
 # Designing Architecture
 
+### When to Load
+
+- **Trigger**: System design, module structure, new project scaffolding, choosing architecture patterns
+- **Skip**: Simple bug fixes or minor code changes that don't affect architecture
+
 ## Architecture Decision Workflow
 
 Copy this checklist and track progress:
@@ -23,23 +28,24 @@ Architecture Design Progress:
 
 ### By Project Size
 
-| Size | Recommended Pattern |
-|------|---------------------|
-| Small (<10K LOC) | Simple MVC/Layered |
-| Medium (10K-100K) | Clean Architecture |
-| Large (>100K) | Modular Monolith or Microservices |
+| Size              | Recommended Pattern               |
+| ----------------- | --------------------------------- |
+| Small (<10K LOC)  | Simple MVC/Layered                |
+| Medium (10K-100K) | Clean Architecture                |
+| Large (>100K)     | Modular Monolith or Microservices |
 
 ### By Team Size
 
-| Team | Recommended |
-|------|-------------|
-| 1-3 devs | Monolith with clear modules |
-| 4-10 devs | Modular Monolith |
-| 10+ devs | Microservices (if justified) |
+| Team      | Recommended                  |
+| --------- | ---------------------------- |
+| 1-3 devs  | Monolith with clear modules  |
+| 4-10 devs | Modular Monolith             |
+| 10+ devs  | Microservices (if justified) |
 
 ## Common Patterns
 
 ### 1. Layered Architecture
+
 ```
 ┌─────────────────────────────┐
 │       Presentation          │  ← UI, API Controllers
@@ -51,9 +57,11 @@ Architecture Design Progress:
 │      Infrastructure         │  ← Database, External APIs
 └─────────────────────────────┘
 ```
+
 **Use when**: Simple CRUD apps, small teams, quick prototypes
 
 ### 2. Clean Architecture
+
 ```
 ┌─────────────────────────────────────┐
 │            Frameworks & Drivers      │
@@ -68,9 +76,11 @@ Architecture Design Progress:
 │  └─────────────────────────────┘    │
 └─────────────────────────────────────┘
 ```
+
 **Use when**: Complex business logic, long-lived projects, testability is key
 
 ### 3. Hexagonal (Ports & Adapters)
+
 ```
         ┌──────────┐
         │ HTTP API │
@@ -87,9 +97,11 @@ Architecture Design Progress:
         │ Database │
         └──────────┘
 ```
+
 **Use when**: Need to swap external dependencies, multiple entry points
 
 ### 4. Event-Driven Architecture
+
 ```
 Producer → Event Bus → Consumer
               │
@@ -97,9 +109,11 @@ Producer → Event Bus → Consumer
               │
               └─→ Consumer
 ```
+
 **Use when**: Loose coupling needed, async processing, scalability
 
 ### 5. CQRS (Command Query Responsibility Segregation)
+
 ```
 ┌─────────────┐      ┌─────────────┐
 │  Commands   │      │   Queries   │
@@ -113,11 +127,13 @@ Producer → Event Bus → Consumer
                 ▼
            Event Store
 ```
+
 **Use when**: Different read/write scaling, complex domains, event sourcing
 
 ## Directory Structure Patterns
 
 ### Feature-Based (Recommended for medium+)
+
 ```
 src/
 ├── features/
@@ -140,6 +156,7 @@ src/
 ```
 
 ### Layer-Based (Simple apps)
+
 ```
 src/
 ├── controllers/
@@ -167,23 +184,28 @@ Use this template to document architectural decisions:
 ## Decision: [What we're deciding]
 
 ### Context
+
 [Why this decision is needed now]
 
 ### Options Considered
+
 1. Option A: [Description]
 2. Option B: [Description]
 
 ### Trade-offs
-| Criteria | Option A | Option B |
-|----------|----------|----------|
-| Complexity | Low | High |
-| Scalability | Medium | High |
-| Team familiarity | High | Low |
+
+| Criteria         | Option A | Option B |
+| ---------------- | -------- | -------- |
+| Complexity       | Low      | High     |
+| Scalability      | Medium   | High     |
+| Team familiarity | High     | Low      |
 
 ### Decision
+
 We chose [Option] because [reasoning].
 
 ### Consequences
+
 - [What this enables]
 - [What this constrains]
 ```

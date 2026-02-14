@@ -5,6 +5,11 @@ description: Designs REST and GraphQL APIs including endpoints, error handling, 
 
 # Designing APIs
 
+### When to Load
+
+- **Trigger**: Designing REST or GraphQL endpoints, API contracts, versioning, request/response formats
+- **Skip**: Internal-only code with no API surface
+
 ## API Design Workflow
 
 Copy this checklist and track progress:
@@ -23,6 +28,7 @@ API Design Progress:
 ## REST API Design
 
 ### URL Structure
+
 ```
 # Resource-based URLs (nouns, not verbs)
 GET    /users              # List users
@@ -42,23 +48,25 @@ GET    /users?page=2&limit=20&sort=-createdAt
 ```
 
 ### HTTP Status Codes
-| Code | Meaning | Use Case |
-|------|---------|----------|
-| 200 | OK | Successful GET, PUT, PATCH |
-| 201 | Created | Successful POST |
-| 204 | No Content | Successful DELETE |
-| 400 | Bad Request | Invalid input |
-| 401 | Unauthorized | Missing/invalid auth |
-| 403 | Forbidden | Valid auth, no permission |
-| 404 | Not Found | Resource doesn't exist |
-| 409 | Conflict | Duplicate, state conflict |
-| 422 | Unprocessable | Validation failed |
-| 429 | Too Many Requests | Rate limited |
-| 500 | Internal Error | Server error |
+
+| Code | Meaning           | Use Case                   |
+| ---- | ----------------- | -------------------------- |
+| 200  | OK                | Successful GET, PUT, PATCH |
+| 201  | Created           | Successful POST            |
+| 204  | No Content        | Successful DELETE          |
+| 400  | Bad Request       | Invalid input              |
+| 401  | Unauthorized      | Missing/invalid auth       |
+| 403  | Forbidden         | Valid auth, no permission  |
+| 404  | Not Found         | Resource doesn't exist     |
+| 409  | Conflict          | Duplicate, state conflict  |
+| 422  | Unprocessable     | Validation failed          |
+| 429  | Too Many Requests | Rate limited               |
+| 500  | Internal Error    | Server error               |
 
 ### Response Formats
 
 **Success Response:**
+
 ```json
 {
   "data": {
@@ -76,6 +84,7 @@ GET    /users?page=2&limit=20&sort=-createdAt
 ```
 
 **List Response with Pagination:**
+
 ```json
 {
   "data": [...],
@@ -94,6 +103,7 @@ GET    /users?page=2&limit=20&sort=-createdAt
 ```
 
 **Error Response:**
+
 ```json
 {
   "error": {
@@ -115,12 +125,14 @@ GET    /users?page=2&limit=20&sort=-createdAt
 ## API Versioning
 
 **URL Versioning (Recommended):**
+
 ```
 /api/v1/users
 /api/v2/users
 ```
 
 **Header Versioning:**
+
 ```
 Accept: application/vnd.api+json; version=1
 ```
@@ -128,16 +140,19 @@ Accept: application/vnd.api+json; version=1
 ## Authentication Patterns
 
 **JWT Bearer Token:**
+
 ```
 Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 ```
 
 **API Key:**
+
 ```
 X-API-Key: your-api-key
 ```
 
 ## Rate Limiting Headers
+
 ```
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 95
@@ -148,6 +163,7 @@ Retry-After: 60
 ## GraphQL Patterns
 
 **Schema Design:**
+
 ```graphql
 type Query {
   user(id: ID!): User
@@ -200,6 +216,7 @@ Validation Checklist:
 If validation fails, return to the relevant design step and address the issues.
 
 ## Security Checklist
+
 - [ ] HTTPS only
 - [ ] Authentication on all endpoints
 - [ ] Authorization checks

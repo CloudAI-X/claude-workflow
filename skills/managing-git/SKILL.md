@@ -5,6 +5,11 @@ description: Manages Git workflows including branching, commits, and pull reques
 
 # Managing Git
 
+### When to Load
+
+- **Trigger**: Branching strategies, commit workflows, pull requests, merge conflicts, version control questions
+- **Skip**: Tasks that do not involve git operations
+
 ## Feature Development Workflow
 
 Copy this checklist and track progress:
@@ -22,17 +27,20 @@ Feature Development Progress:
 ## Branching Strategies
 
 ### GitHub Flow (Recommended for most projects)
+
 ```
 main ──●────●────●────●────●── (always deployable)
         \          /
 feature  └──●──●──┘
 ```
+
 - `main` is always deployable
 - Feature branches from main
 - PR + review + merge
 - Deploy after merge
 
 ### Git Flow (For release-based projects)
+
 ```
 main     ──●─────────────●────── (releases only)
             \           /
@@ -46,6 +54,7 @@ feature      └──●┘
 ## Commit Conventions
 
 ### Conventional Commits Format
+
 ```
 <type>(<scope>): <description>
 
@@ -55,19 +64,21 @@ feature      └──●┘
 ```
 
 ### Types
-| Type | Description |
-|------|-------------|
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation only |
-| `style` | Formatting, no logic change |
+
+| Type       | Description                                         |
+| ---------- | --------------------------------------------------- |
+| `feat`     | New feature                                         |
+| `fix`      | Bug fix                                             |
+| `docs`     | Documentation only                                  |
+| `style`    | Formatting, no logic change                         |
 | `refactor` | Code change that neither fixes bug nor adds feature |
-| `perf` | Performance improvement |
-| `test` | Adding/updating tests |
-| `chore` | Build process, dependencies |
-| `ci` | CI configuration |
+| `perf`     | Performance improvement                             |
+| `test`     | Adding/updating tests                               |
+| `chore`    | Build process, dependencies                         |
+| `ci`       | CI configuration                                    |
 
 ### Examples
+
 ```bash
 feat(auth): add OAuth2 login support
 
@@ -85,6 +96,7 @@ Now returns appropriate error message to user.
 ```
 
 ## Branch Naming
+
 ```
 <type>/<ticket-id>-<short-description>
 
@@ -110,34 +122,41 @@ PR Checklist:
 ```
 
 ### PR Template
+
 ```markdown
 ## Summary
+
 [Brief description of changes]
 
 ## Changes
+
 - [Change 1]
 - [Change 2]
 
 ## Testing
+
 - [ ] Unit tests added/updated
 - [ ] Manual testing performed
 - [ ] E2E tests pass
 
 ## Screenshots (if UI changes)
+
 [Before/After screenshots]
 ```
 
 ### PR Size Guidelines
-| Size | Lines Changed | Review Guidance |
-|------|---------------|-----------------|
-| XS | < 50 | Quick review |
-| S | 50-200 | Standard review |
-| M | 200-500 | Thorough review |
-| L | 500+ | Split if possible |
+
+| Size | Lines Changed | Review Guidance   |
+| ---- | ------------- | ----------------- |
+| XS   | < 50          | Quick review      |
+| S    | 50-200        | Standard review   |
+| M    | 200-500       | Thorough review   |
+| L    | 500+          | Split if possible |
 
 ## Common Git Commands
 
 ### Daily Workflow
+
 ```bash
 # Start new feature
 git checkout main
@@ -157,6 +176,7 @@ git push -u origin HEAD
 ```
 
 ### Fixing Mistakes
+
 ```bash
 # Amend last commit (before push)
 git commit --amend
@@ -175,6 +195,7 @@ git rebase -i HEAD~3
 ```
 
 ### Advanced Operations
+
 ```bash
 # Cherry-pick specific commit
 git cherry-pick <commit-hash>

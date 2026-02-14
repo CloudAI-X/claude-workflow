@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-02-14
+
+### Added
+
+- **4 New Skills**
+  - `database-design` - Schema design, indexing strategies, query optimization, migrations
+  - `devops-infrastructure` - Docker, CI/CD, deployment strategies, IaC, monitoring
+  - `error-handling` - Error patterns by language, structured logging, retry/circuit breakers
+  - `security-patterns` - JWT/OAuth auth, RBAC, secrets management, CORS, rate limiting
+
+- **7 New Commands**
+  - `/project-starter:refactor-guided` - 4-phase systematic refactoring with safety rules
+  - `/project-starter:dependency-upgrade` - Safe dependency upgrades with rollback
+  - `/project-starter:plan` - Manus-style persistent PLAN.md with phase tracking
+  - `/project-starter:tutorial` - Interactive guided tutorial for first-time users
+  - `/project-starter:bootstrap-repo` - 10-agent parallel repo exploration and CODEBASE.md generation
+  - `/project-starter:save-session-learnings` - Persist session discoveries to CLAUDE.md/AGENTS.md
+  - `/project-starter:metrics` - View agent performance metrics and session history
+
+- **5 New Hooks**
+  - `pre-commit-check.py` - Detects debug statements, temp markers, large file content
+  - `branch-protection.sh` - Warns on git operations targeting protected branches
+  - `typescript-check.py` - Runs `tsc --noEmit` after editing .ts/.tsx files
+  - `suggest-doc-updates.py` - Suggests CLAUDE.md updates when significant changes detected
+  - `track-metrics.py` - Logs session telemetry to `.claude/agent-metrics.jsonl`
+
+- **On-Demand Context Loading**
+  - All 14 skills now include "When to Load" sections with trigger/skip conditions
+
+- **CI/CD Pipeline**
+  - `.github/workflows/validate.yml` - Plugin validation (JSON, scripts, frontmatter, links)
+
+### Changed
+
+- **All 7 Agents Upgraded** with:
+  - Action-first directive (act before explaining)
+  - Adaptive effort scaling (Instant/Light/Deep/Exhaustive)
+  - Adversarial self-review protocol (5-point checklist)
+  - Intellectual honesty framework (Certain/Likely/Uncertain)
+  - Expanded auto-trigger keywords
+  - Paired WRONG/CORRECT anti-pattern examples for each domain
+- **`web-design-guidelines` skill** rewritten as self-contained 190-line reference (was 37-line external URL dependency)
+- **Hook error messages** now include actionable remediation suggestions across all hooks
+- **`debugger` agent** gains escalation protocol (after 3 failed attempts: web search, backtrack)
+- **`security-auditor` agent** gains dependency vulnerability checking section
+
+---
+
 ## [1.1.0] - 2025-01-07
 
 ### Added
@@ -71,4 +119,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive documentation (README, PERMISSIONS, MCP servers guide)
 - MIT License
 
-[1.0.0]: https://github.com/CloudAI-X/claude-workflow/releases/tag/v1.0.0
+[1.2.0]: https://github.com/CloudAI-X/claude-workflow-v2/releases/tag/v1.2.0
+[1.1.0]: https://github.com/CloudAI-X/claude-workflow-v2/releases/tag/v1.1.0
+[1.0.0]: https://github.com/CloudAI-X/claude-workflow-v2/releases/tag/v1.0.0

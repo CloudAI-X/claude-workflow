@@ -1,0 +1,311 @@
+name: Validate Plugin
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate JSON syntax
+        run: |
+          echo "=== Validating JSON files ==="
+          errors=0
+          while IFS= read -r f; do
+            if python3 -m json.tool "$f" > /dev/null 2>&1; then
+              echo "  OK: $f"
+            else
+              echo "  FAIL: $f"
+              errors=$((errors + 1))
+            fi
+          done < <(find . -name '*.json' -not -path './.git/*' -not -path '*/node_modules/*')
+
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors JSON file(s) have syntax errors"
+            exit 1
+          fi
+          echo "All JSON files are valid."
+
+      - name: Validate hook script references in hooks.json
+        run: |
+          echo "=== Checking hook script references ==="
+          errors=0
+          # Extract script paths from hooks.json, replacing ${CLAUDE_PLUGIN_ROOT} with .
+          scripts=$(python3 -c "
+          import json, re
+          with open('hooks/hooks.json') as f:
+              data = json.load(f)
+          for event_hooks in data.get('hooks', {}).values():
+              for group in event_hooks:
+                  for hook in group.get('hooks', []):
+                      cmd = hook.get('command', '')
+                      # Extract the script path (last argument that looks like a file path)
+                      parts = cmd.split()
+                      for part in parts:
+                          path = part.replace('\${CLAUDE_PLUGIN_ROOT}', '.')
+                          if path.endswith('.py') or path.endswith('.sh'):
+                              print(path)
+          ")
+
+          for script in $scripts; do
+            if [ -f "$script" ]; then
+              echo "  OK: $script exists"
+            else
+              echo "  FAIL: $script not found (referenced in hooks.json)"
+              errors=$((errors + 1))
+            fi
+          done
+
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors hook script reference(s) are broken"
+            exit 1
+          fi
+          echo "All hook script references are valid."
+
+      - name: Check Python syntax for .py hooks
+        run: |
+          echo "=== Checking Python syntax ==="
+          errors=0
+          while IFS= read -r f; do
+            if python3 -m py_compile "$f" 2>/dev/null; then
+              echo "  OK: $f"
+            else
+              echo "  FAIL: $f"
+              errors=$((errors + 1))
+            fi
+          done < <(find hooks -name '*.py' 2>/dev/null)
+
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors Python hook(s) have syntax errors"
+            exit 1
+          fi
+          echo "All Python hooks have valid syntax."
+
+      - name: Check Bash syntax for .sh hooks
+        run: |
+          echo "=== Checking Bash syntax ==="
+          errors=0
+          while IFS= read -r f; do
+            if bash -n "$f" 2>/dev/null; then
+              echo "  OK: $f"
+            else
+              echo "  FAIL: $f"
+              errors=$((errors + 1))
+            fi
+          done < <(find hooks -name '*.sh' 2>/dev/null)
+
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors Bash hook(s) have syntax errors"
+            exit 1
+          fi
+          echo "All Bash hooks have valid syntax."
+
+      - name: Validate agent frontmatter
+        run: |
+          echo "=== Validating agent YAML frontmatter ==="
+          errors=0
+          required_fields="name description tools model"
+
+          for f in agents/*.md; do
+            [ -f "$f" ] || continue
+            # Extract frontmatter between --- delimiters
+            frontmatter=$(sed -n '/^---$/,/^---$/p' "$f" | sed '1d;$d')
+            if [ -z "$frontmatter" ]; then
+              echo "  FAIL: $f - no YAML frontmatter found"
+              errors=$((errors + 1))
+              continue
+            fi
+
+            missing=""
+            for field in $required_fields; do
+              if ! echo "$frontmatter" | grep -q "^${field}:"; then
+                missing="$missing $field"
+              fi
+            done
+
+            if [ -n "$missing" ]; then
+              echo "  FAIL: $f - missing required fields:$missing"
+              errors=$((errors + 1))
+            else
+              echo "  OK: $f"
+            fi
+          done
+
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors agent file(s) have frontmatter issues"
+            exit 1
+          fi
+          echo "All agent frontmatter is valid."
+
+      - name: Validate skill frontmatter
+        run: |
+          echo "=== Validating skill YAML frontmatter ==="
+          errors=0
+          required_fields="name description"
+
+          for f in skills/*/SKILL.md; do
+            [ -f "$f" ] || continue
+            frontmatter=$(sed -n '/^---$/,/^---$/p' "$f" | sed '1d;$d')
+            if [ -z "$frontmatter" ]; then
+              echo "  FAIL: $f - no YAML frontmatter found"
+              errors=$((errors + 1))
+              continue
+            fi
+
+            missing=""
+            for field in $required_fields; do
+              if ! echo "$frontmatter" | grep -q "^${field}:"; then
+                missing="$missing $field"
+              fi
+            done
+
+            if [ -n "$missing" ]; then
+              echo "  FAIL: $f - missing required fields:$missing"
+              errors=$((errors + 1))
+            else
+              echo "  OK: $f"
+            fi
+          done
+
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors skill file(s) have frontmatter issues"
+            exit 1
+          fi
+          echo "All skill frontmatter is valid."
+
+      - name: Validate command frontmatter
+        run: |
+          echo "=== Validating command YAML frontmatter ==="
+          errors=0
+
+          for f in commands/*.md; do
+            [ -f "$f" ] || continue
+            frontmatter=$(sed -n '/^---$/,/^---$/p' "$f" | sed '1d;$d')
+            if [ -z "$frontmatter" ]; then
+              echo "  FAIL: $f - no YAML frontmatter found"
+              errors=$((errors + 1))
+              continue
+            fi
+
+            # Commands must have at least a description field
+            if ! echo "$frontmatter" | grep -q "^description:"; then
+              echo "  FAIL: $f - missing required field: description"
+              errors=$((errors + 1))
+            else
+              echo "  OK: $f"
+            fi
+          done
+
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors command file(s) have frontmatter issues"
+            exit 1
+          fi
+          echo "All command frontmatter is valid."
+
+      - name: Check for broken internal links
+        run: |
+          echo "=== Checking internal links/references ==="
+          errors=0
+
+          # Check that agents referenced in skills fields exist
+          for f in agents/*.md; do
+            [ -f "$f" ] || continue
+            frontmatter=$(sed -n '/^---$/,/^---$/p' "$f" | sed '1d;$d')
+            skills_line=$(echo "$frontmatter" | grep '^skills:' | sed 's/^skills: *//')
+            if [ -n "$skills_line" ]; then
+              IFS=',' read -ra skill_refs <<< "$skills_line"
+              for ref in "${skill_refs[@]}"; do
+                ref=$(echo "$ref" | xargs)  # trim whitespace
+                [ -z "$ref" ] && continue
+                if [ ! -d "skills/$ref" ]; then
+                  echo "  WARN: $f references skill '$ref' but skills/$ref/ does not exist"
+                  # Warnings only - don't fail for skill references since they
+                  # may use shorthand names resolved at runtime
+                fi
+              done
+            fi
+          done
+
+          # Check that hook scripts referenced in hooks.json resolve to real files
+          hook_scripts=$(python3 -c "
+          import json
+          with open('hooks/hooks.json') as f:
+              data = json.load(f)
+          for event_hooks in data.get('hooks', {}).values():
+              for group in event_hooks:
+                  for hook in group.get('hooks', []):
+                      cmd = hook.get('command', '')
+                      parts = cmd.split()
+                      for part in parts:
+                          path = part.replace('\${CLAUDE_PLUGIN_ROOT}', '.')
+                          if path.endswith('.py') or path.endswith('.sh'):
+                              print(path)
+          ")
+
+          for script in $hook_scripts; do
+            if [ ! -f "$script" ]; then
+              echo "  FAIL: hooks.json references '$script' which does not exist"
+              errors=$((errors + 1))
+            fi
+          done
+
+          # Check that plugin.json references are consistent
+          if [ -f ".claude-plugin/plugin.json" ]; then
+            echo "  OK: .claude-plugin/plugin.json exists"
+          else
+            echo "  FAIL: .claude-plugin/plugin.json is missing"
+            errors=$((errors + 1))
+          fi
+
+          if [ -f ".claude-plugin/marketplace.json" ]; then
+            echo "  OK: .claude-plugin/marketplace.json exists"
+          else
+            echo "  FAIL: .claude-plugin/marketplace.json is missing"
+            errors=$((errors + 1))
+          fi
+
+          # Check markdown files for broken relative links to local files
+          while IFS= read -r mdfile; do
+            # Extract markdown links like [text](path) excluding http/https/mailto
+            links=$(grep -oP '\[.*?\]\(\K[^)]+' "$mdfile" 2>/dev/null | grep -v '^http' | grep -v '^mailto' | grep -v '^#' | grep -v '^\!' || true)
+            for link in $links; do
+              # Remove any anchor fragments
+              clean_link=$(echo "$link" | sed 's/#.*//')
+              [ -z "$clean_link" ] && continue
+              # Resolve relative to the file's directory
+              file_dir=$(dirname "$mdfile")
+              target="$file_dir/$clean_link"
+              if [ ! -e "$target" ] && [ ! -e "$clean_link" ]; then
+                echo "  WARN: $mdfile has potentially broken link: $link"
+              fi
+            done
+          done < <(find . -name '*.md' -not -path './.git/*' -not -path '*/node_modules/*')
+
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors broken internal reference(s) found"
+            exit 1
+          fi
+          echo "Internal link check complete."
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "============================================"
+          echo "  Plugin Validation Complete"
+          echo "============================================"
+          echo ""
+          echo "Checks performed:"
+          echo "  1. JSON syntax validation"
+          echo "  2. Hook script reference validation"
+          echo "  3. Python hook syntax check"
+          echo "  4. Bash hook syntax check"
+          echo "  5. Agent frontmatter validation (name, description, tools, model)"
+          echo "  6. Skill frontmatter validation (name, description)"
+          echo "  7. Command frontmatter validation (description)"
+          echo "  8. Internal link/reference check"

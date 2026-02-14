@@ -2,7 +2,7 @@
 
 const { install } = require("../lib/installer");
 
-const REPO = "CloudAI-X/claude-workflow";
+const REPO = "CloudAI-X/claude-workflow-v2";
 const NAME = "claude-workflow-v2";
 
 // Parse command line arguments
@@ -20,7 +20,7 @@ Installs agents, skills, commands, and hooks to .claude/ in current directory.
 
 After install, run 'claude' to start.
 
-Repository: https://github.com/CloudAI-X/claude-workflow
+Repository: https://github.com/CloudAI-X/claude-workflow-v2
 `);
   process.exit(0);
 }
